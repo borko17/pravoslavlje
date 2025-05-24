@@ -7,7 +7,7 @@
 ps1-150 - Псалми Давидови
 ---------------------------------"
 
-  "po": "---------------------------------
+  "p": "---------------------------------
 #####  POMOĆ  #####
 Skripta podržava unose u sledećim formatima:
 1.) Jedan odlomak iz knjige. 
@@ -5363,28 +5363,6 @@ ps5-9 ==> psalam 5, 6, 7, 8 i 9.
 5. Хвалите га уз јасне кимвале, хвалите га уз кимвале громовне.
 6. *Све што дише нека хвали Господа! Алилуја! [*Пс 41, 13; Отк 5, 13.] "
 
-  "p": "---------------------------------
-#####  POMOĆ  #####
-Skripta podržava unose u sledećim formatima:
-1.) Jedan odlomak iz knjige. 
-Primjeri: 
-1moj1 ==> 1. Knjiga Mojsijeva, 1. Glava
-ps5 ==> Psalam 5.
 
-2.) Višesruke odlomke u nizu.
-Primjeri:
-1moj5-8 ==> 1moj5, 1moj6, i 1moj7, 1moj8.
-ps1-10 ==> prvih 10 psalama.
-
-3.) Jedan stih iz odlomka.
-Primjeri:
-1moj9,13 ==> 1. Knjiga Mojsijeva, 9. glava, 13. stih
-ps19,1 ==> Psalam 19., 1. Stih
-
-4.) Niz od više stihova.
-Primjeri:
-1moj12, 1-2 ==> 1. Knjiga Mojsijeva, 12. glava, prva dva stiha.
-ps5-9 ==> psalam 5, 6, 7, 8 i 9.
----------------------------------"
 
 }
