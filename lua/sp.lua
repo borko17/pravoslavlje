@@ -49,7 +49,7 @@ local nova_stajenovo = skript_body:match('skript_novo%s*=%s*"([^"]+)"')
 local json_verzija = body:match('"сп"%s*:%s*"(.-)"')
 local json_stajenovo = body:match('"ново"%s*:%s*"(.-)"')
 
-local skript_verzija = "1.0.7"
+local skript_verzija = "1.0.8"
 local skript_novo = "ништа ново"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
