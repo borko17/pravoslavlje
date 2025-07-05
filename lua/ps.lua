@@ -36,6 +36,13 @@ if etag then
 else
   print("ETag није пронађен у заглављу.")
 end
+
+---
+-- ✅ Провера верзије скрипте из JSON-а
+local nova_verzija = body:match('"луа"%s*:%s*"(.-)"')
+local json_verzija = body:match('"сп"%s*:%s*"(.-)"')
+local skript_verzija = "1.0.2"  -- тренутна верзија скрипте
+local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/9d3253ec145ceb019544919a7751da62f1110a2d/lua/ps.lua"
 -- 02
 
 local function latinica_u_cirilicu(s)
@@ -254,8 +261,23 @@ else
 end
 
 -- tekst
-if novi_unos == "l" or novi_unos == "л" then
-    print("Тренутно користите lua верзију:\n" .. _VERSION .."\n\nВерзија скрипте: 25.0704\nСкрипта је тестирана на\nLuaj-jse 3.0.1")
+if novi_unos == "v" or novi_unos == "в" then
+    print("\n== Свето Писмо ==")
+    print("Верзија Светог Писма: " .. json_verzija)
+    print("\n== Скрипта ==")
+    print("Верзија скрипте: ".. skript_verzija)
+if nova_verzija then
+  if nova_verzija ~= skript_verzija then
+    print("⚠️ Упозорење: Доступна је нова верзија скрипте: " .. nova_verzija)
+    print("🔗 Преузми нову верзију са:\n" .. github_link)
+  else
+    print("✅ Скрипта је ажурна. Верзија: " .. nova_verzija)
+  end
+else
+  print("ℹ️ Верзија скрипте није пронађена у JSON-у.")
+end
+  print("\n== lua ==")
+    print("Тренутно користите lua верзију:\n" .. _VERSION .."\n\n(Скрипта је тестирана на:\nLuaj-jse 3.0.1)\n")
     goto continue
 end
 -- testend
