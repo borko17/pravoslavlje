@@ -33,7 +33,7 @@ print("🏁 Преузето " .. velicina_zaokruzena .. " MB")
 ---
 -- ✅ Провера верзије скрипте и JSON-а
 -- 🔄 Преузми скрипту ради провере нове верзије
-local handle_ver = io.popen('curl -s https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/ps.lua')
+local handle_ver = io.popen('curl -s https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua')
 if not handle_ver then
   print("⚠️ Грешка при преузимању скрипте за проверу верзије.")
   return
