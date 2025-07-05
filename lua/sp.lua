@@ -44,13 +44,16 @@ handle_ver:close()
 
 local nova_verzija = skript_body:match('skript_verzija%s*=%s*"([^"]+)"')
 local nova_stajenovo = skript_body:match('skript_novo%s*=%s*"([^"]+)"')
+local nova_datum = skript_body:match('skript_datum%s*=%s*"([^"]+)"')
 
 
 local json_verzija = body:match('"сп"%s*:%s*"(.-)"')
 local json_stajenovo = body:match('"ново"%s*:%s*"(.-)"')
+local json_datum = body:match('"датум"%s*:%s*"(.-)"')
 
-local skript_verzija = "1.0.9"
-local skript_novo = "тест верзије"
+local skript_verzija = "1.0.10"
+local skript_novo = "додат преглед датума измјене"
+local skript_datum = "05.07.2025 21:20"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
 
@@ -274,7 +277,7 @@ if novi_unos == "v" or novi_unos == "в" then
     print("\n== Свето Писмо ==")
     print("Верзија Светог Писма: " .. json_verzija)
     print("Шта је ново: " .. json_stajenovo)
-    
+    print("Вријеме измјене: " .. json_datum)
     print("\n== Скрипта ==")
     print("Верзија скрипте: " .. skript_verzija)
 if nova_verzija then
@@ -282,6 +285,7 @@ if nova_verzija then
     print("⚠️ Скрипта није ажурна.")
     print("Последња верзија: " .. nova_verzija)
     print("Шта је ново: " .. nova_stajenovo)
+    print("Вријеме измјене: " .. nova_datum)
     print("\n🔗 Преузми нову верзију са:")
     print(github_link)
   else
