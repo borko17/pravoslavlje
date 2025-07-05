@@ -46,7 +46,8 @@ local nova_verzija = skript_body:match('skript_verzija%s*=%s*"([^"]+)"')
 
 
 local json_verzija = body:match('"сп"%s*:%s*"(.-)"')
-local skript_verzija = "1.0.5"  -- тренутна верзија скрипте
+
+local skript_verzija = "1.0.6"  -- тренутна верзија скрипте
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/ps.lua"
 -- 02
 
@@ -278,9 +279,9 @@ end
 print("Верзија скрипте: " .. skript_verzija)
 
 if nova_verzija then
-  print("⚠️ Упозорење: Скрипта није ажурна.")
-  print("На GitHub-у је последња верзија: " .. nova_verzija)
   if nova_verzija ~= skript_verzija then
+    print("⚠️ Упозорење: Скрипта није ажурна.")
+    print("На GitHub-у је последња верзија: " .. nova_verzija)
     print("🔗 Преузми нову верзију са:\n" .. github_link)
     print("(На андроиду можете преузети sp.lua фајл са FDM апликацијом)")
   else
