@@ -51,7 +51,7 @@ local json_verzija = body:match('"сп"%s*:%s*"(.-)"')
 local json_stajenovo = body:match('"ново"%s*:%s*"(.-)"')
 local json_datum = body:match('"датум"%s*:%s*"(.-)"')
 
-local skript_verzija = "1.0.10"
+local skript_verzija = "1.0.11"
 local skript_novo = "додат преглед датума измјене"
 local skript_datum = "05.07.2025 21:20"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
@@ -290,6 +290,7 @@ if nova_verzija then
     print(github_link)
   else
     print("✔️ Скрипта је ажурна.")
+    print("Вријеме измјене: " .. nova_datum)
   end
 else
   print("ℹ️ Није могуће одредити последњу верзију скрипте са GitHub-а.")
