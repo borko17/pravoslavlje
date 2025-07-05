@@ -42,7 +42,7 @@ end
 local nova_verzija = body:match('"луа"%s*:%s*"(.-)"')
 local json_verzija = body:match('"сп"%s*:%s*"(.-)"')
 local skript_verzija = "1.0.2"  -- тренутна верзија скрипте
-local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/9d3253ec145ceb019544919a7751da62f1110a2d/lua/ps.lua"
+local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/9d3253ec145ceb019544919a7751da62f1110a2d/lua/sp.lua"
 -- 02
 
 local function latinica_u_cirilicu(s)
