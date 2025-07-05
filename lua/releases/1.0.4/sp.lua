@@ -35,7 +35,7 @@ print("🏁 Преузето " .. velicina_zaokruzena .. " MB")
 local nova_verzija = body:match('"луа"%s*:%s*"(.-)"')
 local json_verzija = body:match('"сп"%s*:%s*"(.-)"')
 local skript_verzija = "1.0.4"  -- тренутна верзија скрипте
-local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/ps.lua"
+local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
 
 local function latinica_u_cirilicu(s)
