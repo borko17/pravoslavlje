@@ -43,7 +43,7 @@ local skript_body = handle_ver:read("*a")
 handle_ver:close()
 
 local nova_verzija = skript_body:match('skript_verzija%s*=%s*"([^"]+)"')
-local nova_stajenovo = skript_body:match('json_stajenovo%s*=%s*"([^"]+)"')
+local nova_stajenovo = skript_body:match('skript_novo%s*=%s*"([^"]+)"')
 
 
 local json_verzija = body:match('"сп"%s*:%s*"(.-)"')
@@ -51,7 +51,7 @@ local json_stajenovo = body:match('"ново"%s*:%s*"(.-)"')
 
 local skript_verzija = "1.0.8"
 local skript_novo = "ништа ново"
-local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/ps.lua"
+local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
 
 local function latinica_u_cirilicu(s)
@@ -640,4 +640,25 @@ end
   else
 
   print("🚧 Није пронађен одломак: " .. podaci.odlomak)
-  local knjiga = podaci.o
+  local knjiga = podaci.odlomak:match("^(.-)%d+$")
+  if knjiga then
+    local najveca_glava = 0
+    for odlomak, _ in body:gmatch('"(.-)"%s*:%s*"[^"]-"') do
+      local k, broj = odlomak:match("^(.-)(%d+)$")
+      if k == knjiga then
+        local n = tonumber(broj)
+        if n and n > najveca_glava then
+          najveca_glava = n
+        end
+      end
+    end
+    if najveca_glava > 0 then
+      print("📘 Књига " .. knjiga .. " има " .. broj_sa_imenicom(najveca_glava, "главу", "главе", "глава") .. ".")
+    end
+  end
+end
+  end
+  ::continue::
+end
+
+print("-----------\n☦️ С Богом!")
