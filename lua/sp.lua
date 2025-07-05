@@ -49,8 +49,8 @@ local nova_stajenovo = skript_body:match('skript_novo%s*=%s*"([^"]+)"')
 local json_verzija = body:match('"сп"%s*:%s*"(.-)"')
 local json_stajenovo = body:match('"ново"%s*:%s*"(.-)"')
 
-local skript_verzija = "1.0.8"
-local skript_novo = "ништа ново"
+local skript_verzija = "1.0.9"
+local skript_novo = "тест верзије"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
 
@@ -276,11 +276,12 @@ if novi_unos == "v" or novi_unos == "в" then
     print("Шта је ново: " .. json_stajenovo)
     
     print("\n== Скрипта ==")
-print("Верзија скрипте: " .. skript_verzija)
+    print("Верзија скрипте: " .. skript_verzija)
 if nova_verzija then
   if nova_verzija ~= skript_verzija then
     print("⚠️ Скрипта није ажурна.")
     print("Последња верзија: " .. nova_verzija)
+    print("Шта је ново: " .. nova_stajenovo)
     print("\n🔗 Преузми нову верзију са:")
     print(github_link)
   else
