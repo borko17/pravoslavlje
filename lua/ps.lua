@@ -41,7 +41,7 @@ end
 -- ✅ Провера верзије скрипте из JSON-а
 local nova_verzija = body:match('"луа"%s*:%s*"(.-)"')
 local json_verzija = body:match('"сп"%s*:%s*"(.-)"')
-local skript_verzija = "1.0.2"  -- тренутна верзија скрипте
+local skript_verzija = "1.0.3"  -- тренутна верзија скрипте
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/ps.lua"
 -- 02
 
@@ -271,10 +271,10 @@ if nova_verzija then
     print("⚠️ Упозорење: Доступна је нова верзија скрипте: " .. nova_verzija)
     print("🔗 Преузми нову верзију са:\n" .. github_link)
   else
-    print("✅ Скрипта је ажурна. Верзија: " .. nova_verzija)
+    print("✅ Скрипта је ажурна.")
   end
 else
-  print("ℹ️ Верзија скрипте није пронађена у JSON-у.")
+  print("ℹ️ Верзија скрипте није пронађена.")
 end
   print("\n== lua ==")
     print("Тренутно користите lua верзију:\n" .. _VERSION .."\n\n(Скрипта је тестирана на:\nLuaj-jse 3.0.1)\n")
