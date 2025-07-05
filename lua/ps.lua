@@ -270,6 +270,7 @@ if nova_verzija then
   if nova_verzija ~= skript_verzija then
     print("⚠️ Упозорење: Доступна је нова верзија скрипте: " .. nova_verzija)
     print("🔗 Преузми нову верзију са:\n" .. github_link)
+    print("(На андроиду можете преузети sp.lua фајл са FDM апликацијом)")
   else
     print("✅ Скрипта је ажурна.")
   end
@@ -277,7 +278,7 @@ else
   print("ℹ️ Верзија скрипте није пронађена.")
 end
   print("\n== lua ==")
-    print("Тренутно користите lua верзију:\n" .. _VERSION .."\n\n(Скрипта је тестирана на:\nLuaj-jse 3.0.1)\n")
+    print("Тренутно користите lua верзију:\n" .. _VERSION .."\n\n(Скрипта је тестирана на:\nLuaj-jse 3.0.1 - Yantra Launcher Pro)\n")
     goto continue
 end
 -- testend
