@@ -31,10 +31,22 @@ local velicina_zaokruzena = math.floor(velicina_MB * 100) / 100
 
 print("🏁 Преузето " .. velicina_zaokruzena .. " MB")
 ---
--- ✅ Провера верзије скрипте из JSON-а
-local nova_verzija = body:match('"луа"%s*:%s*"(.-)"')
+-- ✅ Провера верзије скрипте и JSON-а
+-- 🔄 Преузми скрипту ради провере нове верзије
+local handle_ver = io.popen('curl -s https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/ps.lua')
+if not handle_ver then
+  print("⚠️ Грешка при преузимању скрипте за проверу верзије.")
+  return
+end
+
+local skript_body = handle_ver:read("*a")
+handle_ver:close()
+
+local nova_verzija = skript_body:match('skript_verzija%s*=%s*"([^"]+)"')
+
+
 local json_verzija = body:match('"сп"%s*:%s*"(.-)"')
-local skript_verzija = "1.0.4"  -- тренутна верзија скрипте
+local skript_verzija = "1.0.5"  -- тренутна верзија скрипте
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/ps.lua"
 -- 02
 
@@ -263,17 +275,19 @@ else
   print("ETag није пронађен у заглављу.")
 end
     print("\n== Скрипта ==")
-    print("Верзија скрипте: ".. skript_verzija)
+print("Верзија скрипте: " .. skript_verzija)
+
 if nova_verzija then
+  print("⚠️ Упозорење: Скрипта није ажурна.")
+  print("На GitHub-у је последња верзија: " .. nova_verzija)
   if nova_verzija ~= skript_verzija then
-    print("⚠️ Упозорење: Доступна је нова верзија скрипте: " .. nova_verzija)
     print("🔗 Преузми нову верзију са:\n" .. github_link)
     print("(На андроиду можете преузети sp.lua фајл са FDM апликацијом)")
   else
     print("✅ Скрипта је ажурна.")
   end
 else
-  print("ℹ️ Верзија скрипте није пронађена.")
+  print("ℹ️ Није могуће одредити последњу верзију скрипте са GitHub-а.")
 end
   print("\n== lua ==")
     print("Тренутно користите lua верзију:\n" .. _VERSION .."\n\n(Скрипта је тестирана на:\nLuaj-jse 3.0.1 - Yantra Launcher Pro)\n")
