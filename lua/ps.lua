@@ -47,7 +47,7 @@ local nova_verzija = skript_body:match('skript_verzija%s*=%s*"([^"]+)"')
 
 local json_verzija = body:match('"сп"%s*:%s*"(.-)"')
 
-local skript_verzija = "1.0.6"  -- тренутна верзија скрипте
+local skript_verzija = "1.0.7"  -- тренутна верзија скрипте
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/ps.lua"
 -- 02
 
@@ -270,28 +270,25 @@ end
 if novi_unos == "v" or novi_unos == "в" then
     print("\n== Свето Писмо ==")
     print("Верзија Светог Писма: " .. json_verzija)
-if etag then
-  print("ETag: " .. etag)
-else
-  print("ETag није пронађен у заглављу.")
-end
+    
     print("\n== Скрипта ==")
 print("Верзија скрипте: " .. skript_verzija)
 
 if nova_verzija then
   if nova_verzija ~= skript_verzija then
-    print("⚠️ Упозорење: Скрипта није ажурна.")
-    print("На GitHub-у је последња верзија: " .. nova_verzija)
-    print("🔗 Преузми нову верзију са:\n" .. github_link)
-    print("(На андроиду можете преузети sp.lua фајл са FDM апликацијом)")
+    print("⚠️ Скрипта није ажурна.")
+    print("Последња верзија: " .. nova_verzija)
+    print("\n🔗 Преузми нову верзију са:")
+    print(github_link)
   else
     print("✅ Скрипта је ажурна.")
   end
 else
   print("ℹ️ Није могуће одредити последњу верзију скрипте са GitHub-а.")
 end
+
   print("\n== lua ==")
-    print("Тренутно користите lua верзију:\n" .. _VERSION .."\n\n(Скрипта је тестирана на:\nLuaj-jse 3.0.1 - Yantra Launcher Pro)\n")
+    print("Тренутно користите lua верзију:\n" .. _VERSION .."\n\nСкрипта је тестирана на:\nLuaj-jse 3.0.1\nYantra CLI Launcher Pro")
     goto continue
 end
 -- testend
