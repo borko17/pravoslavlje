@@ -43,11 +43,14 @@ local skript_body = handle_ver:read("*a")
 handle_ver:close()
 
 local nova_verzija = skript_body:match('skript_verzija%s*=%s*"([^"]+)"')
+local nova_stajenovo = skript_body:match('json_stajenovo%s*=%s*"([^"]+)"')
 
 
 local json_verzija = body:match('"сп"%s*:%s*"(.-)"')
+local json_stajenovo = body:match('"ново"%s*:%s*"(.-)"')
 
-local skript_verzija = "1.0.7"  -- тренутна верзија скрипте
+local skript_verzija = "1.0.8"
+local skript_novo = "ништа ново"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/ps.lua"
 -- 02
 
@@ -270,10 +273,10 @@ end
 if novi_unos == "v" or novi_unos == "в" then
     print("\n== Свето Писмо ==")
     print("Верзија Светог Писма: " .. json_verzija)
+    print("Шта је ново: " .. json_stajenovo)
     
     print("\n== Скрипта ==")
 print("Верзија скрипте: " .. skript_verzija)
-
 if nova_verzija then
   if nova_verzija ~= skript_verzija then
     print("⚠️ Скрипта није ажурна.")
@@ -281,7 +284,7 @@ if nova_verzija then
     print("\n🔗 Преузми нову верзију са:")
     print(github_link)
   else
-    print("✅ Скрипта је ажурна.")
+    print("✔️ Скрипта је ажурна.")
   end
 else
   print("ℹ️ Није могуће одредити последњу верзију скрипте са GitHub-а.")
