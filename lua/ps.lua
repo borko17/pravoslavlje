@@ -30,18 +30,11 @@ local velicina_MB = velicina_bajtova / (1024 * 1024)
 local velicina_zaokruzena = math.floor(velicina_MB * 100) / 100
 
 print("🏁 Преузето " .. velicina_zaokruzena .. " MB")
-
-if etag then
-  print("ETag: " .. etag)
-else
-  print("ETag није пронађен у заглављу.")
-end
-
 ---
 -- ✅ Провера верзије скрипте из JSON-а
 local nova_verzija = body:match('"луа"%s*:%s*"(.-)"')
 local json_verzija = body:match('"сп"%s*:%s*"(.-)"')
-local skript_verzija = "1.0.3"  -- тренутна верзија скрипте
+local skript_verzija = "1.0.4"  -- тренутна верзија скрипте
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/ps.lua"
 -- 02
 
@@ -264,6 +257,11 @@ end
 if novi_unos == "v" or novi_unos == "в" then
     print("\n== Свето Писмо ==")
     print("Верзија Светог Писма: " .. json_verzija)
+if etag then
+  print("ETag: " .. etag)
+else
+  print("ETag није пронађен у заглављу.")
+end
     print("\n== Скрипта ==")
     print("Верзија скрипте: ".. skript_verzija)
 if nova_verzija then
