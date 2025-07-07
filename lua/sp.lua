@@ -266,7 +266,7 @@ if unos:lower():match("^п,") or unos:lower():match("^p,") then
 else
   local delovi = {}
   for deo in unos:gmatch("[^;%s]+") do
-    deo = deo:gsub("^[†*§%.,!\"'%-\\%[%]]+", ""):gsub("[†*§%.,!\"'%-\\%[%]]+$", "")
+    deo = deo:gsub("^[()†*§%.,!\"'%-\\%[%]]+", ""):gsub("[()†*§%.,!\"'%-\\%[%]]+$", "")
     -- First expand any ranges in the part
     local prosireni = prosiri_opseg(deo)
     for _, p in ipairs(prosireni) do
