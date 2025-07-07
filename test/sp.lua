@@ -51,9 +51,9 @@ local json_verzija = body:match('"сп"%s*:%s*"(.-)"')
 local json_stajenovo = body:match('"ново"%s*:%s*"(.-)"')
 local json_datum = body:match('"датум"%s*:%s*"(.-)"')
 
-local skript_verzija = "1.0.11"
-local skript_novo = "додат преглед датума измјене"
-local skript_datum = "05.07.2025 21:20"
+local skript_verzija = "1.0.12"
+local skript_novo = "додата подршка за 'идаље'"
+local skript_datum = "07.07.2025 16:35"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
 
@@ -227,6 +227,12 @@ end
 local function izdvoji_stihove(stihovi_str)
   local stihovi = {}
   for deo in stihovi_str:gmatch("[^,]+") do
+    -- Add support for "идаље" (e.g., "6идаље")
+    local start_stih = deo:match("^(%d+)идаље$")
+    if start_stih then
+      return {start=tonumber(start_stih), do_kraja=true}
+    end
+    
     local od, do_ = deo:match("^(%d+)%-(%d+)$")
     if od and do_ then
       for i = tonumber(od), tonumber(do_) do 
@@ -241,7 +247,6 @@ local function izdvoji_stihove(stihovi_str)
   end
   return stihovi
 end
-
 -- 16
 print("\n📜 СВЕТО ПИСМО 📜")
 print("- Унеси скраћеницу из Светог Писма\n- унеси 'с' за садржај или 'п' за помоћ\n- притисни Ентер за излаз")
@@ -603,46 +608,61 @@ end
     end
 
     if podaci.stihovi then
-      local ciljani = izdvoji_stihove(podaci.stihovi)
-      local izabrano = {}
+  local ciljani = izdvoji_stihove(podaci.stihovi)
+  local izabrano = {}
 
-      local i = 1
-      while i <= #linije do
-        local broj = tonumber(linije[i]:match("^(%d+)%."))
-        if broj and ciljani[broj] then
-          local blok = { linije[i] }
-          i = i + 1
-          while i <= #linije and not linije[i]:match("^%d+%.") do
-            table.insert(blok, linije[i])
-            i = i + 1
-          end
-          table.insert(izabrano, table.concat(blok, "\n"))
-        else
+  if ciljani.do_kraja then
+    -- Handle "идаље" case - show from start verse to end of chapter
+    local pronadjen_pocetak = false
+    for _, lin in ipairs(linije) do
+      local broj = tonumber(lin:match("^(%d+)%."))
+      if broj then
+        if broj >= ciljani.start then
+          pronadjen_pocetak = true
+          table.insert(izabrano, lin)
+        end
+      elseif pronadjen_pocetak then
+        table.insert(izabrano, lin)
+      end
+    end
+  else
+    -- Original processing for regular verse ranges
+    local i = 1
+    while i <= #linije do
+      local broj = tonumber(linije[i]:match("^(%d+)%."))
+      if broj and ciljani[broj] then
+        local blok = { linije[i] }
+        i = i + 1
+        while i <= #linije and not linije[i]:match("^%d+%.") do
+          table.insert(blok, linije[i])
           i = i + 1
         end
+        table.insert(izabrano, table.concat(blok, "\n"))
+      else
+        i = i + 1
       end
-
--- 25
-if #izabrano > 0 then
-  print("------- [" .. podaci.odlomak .. "," .. podaci.stihovi .. "] ---")
-  print((table.concat(izabrano, "\n")):gsub("%[(.-)%]", uredi_tekst_u_zagradama))
-else
-  print("🚧 Нема " .. podaci.stihovi .. ". стиха у одломку " .. podaci.odlomak)
-  
-  local broj_stihova = 0
-  for _, lin in ipairs(linije) do
-    if lin:match("^%d+%.") then
-      broj_stihova = broj_stihova + 1
     end
   end
 
-  print("📘 Одломак " .. podaci.odlomak .. " има " .. broj_sa_imenicom(broj_stihova, "стих", "стиха", "стихова") .. ".")
-end
-
-    else
-      print("------- [" .. podaci.odlomak .. "] ---")
-      print(tekst:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
+  if #izabrano > 0 then
+    print("------- [" .. podaci.odlomak .. "," .. podaci.stihovi .. "] ---")
+    print((table.concat(izabrano, "\n")):gsub("%[(.-)%]", uredi_tekst_u_zagradama))
+  else
+    print("🚧 Нема " .. podaci.stihovi .. ". стиха у одломку " .. podaci.odlomak)
+    
+    local broj_stihova = 0
+    for _, lin in ipairs(linije) do
+      if lin:match("^%d+%.") then
+        broj_stihova = broj_stihova + 1
+      end
     end
+
+    print("📘 Одломак " .. podaci.odlomak .. " има " .. broj_sa_imenicom(broj_stihova, "стих", "стиха", "стихова") .. ".")
+  end
+else
+  print("------- [" .. podaci.odlomak .. "] ---")
+  print(tekst:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
+end
   else
 
   print("🚧 Није пронађен одломак: " .. podaci.odlomak)
