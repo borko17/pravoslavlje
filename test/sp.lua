@@ -3,6 +3,7 @@
   затим корисник уноси скраћенице одломака (нпр. "1moj1-5", "ps4-7"),
   скрипта проширује те одломке, претвара латиницу у ћирилицу,
   и приказује тражени текст или стихове.
+  НОВО: Подржава и "идаље" након броја стиха (нпр. "2мој24,6идаље")
 ]]
 
 print("📥 Преузимање Светог Писма.. 7,7MB")
@@ -18,7 +19,7 @@ end
 print("\n=== Свето писмо ===")
 print("Доступне опције:")
 print("- Унеси скраћеницу из Светог Писма\n- унеси 'с' за садржај или 'п' за помоћ\n- притисни Enter за излаз")
-print("(скрипта подржава и уносе у латиници)\n")
+print("(скрипта подржава и уносе у латиници и 'идаље' након броја стиха)\n")
 
 local function prosiri_odlomke(odlomak)
   local naziv, brojevi = odlomak:match("^(.-)(%d[%d%-]*)$")
@@ -71,11 +72,11 @@ while true do
     local naziv, stihovi = deo:match("^([^,]+),?(.*)$")
 
     if alias_map[naziv] then
-  local alias_unos = alias_map[naziv]
-  print("📖 Проширени унос: " .. alias_unos)
-  deo = alias_unos  -- преусмери цео унос у променљиву `deo`
-  naziv, stihovi = deo:match("^([^,]+),?(.*)$")
-end
+      local alias_unos = alias_map[naziv]
+      print("📖 Проширени унос: " .. alias_unos)
+      deo = alias_unos  -- преусмери цео унос у променљиву `deo`
+      naziv, stihovi = deo:match("^([^,]+),?(.*)$")
+    end
 
     local odlomci = prosiri_odlomke(naziv)
     for _, od in ipairs(odlomci) do
@@ -90,17 +91,44 @@ end
 
         if stihovi ~= "" then
           local ciljani = {}
-          for deo in stihovi:gmatch("[^,]+") do
-            local p1, p2 = deo:match("^(%d+)%-(%d+)$")
-            if p1 and p2 then for i = tonumber(p1), tonumber(p2) do ciljani[i] = true end
-            else local b = tonumber(deo); if b then ciljani[b] = true end end
+          local do_kraja = false
+          local start_stih
+          
+          -- Провери да ли је унос у формату "бројидаље" (нпр. "6идаље")
+          start_stih = stihovi:match("^(%d+)идаље$")
+          if start_stih then
+            do_kraja = true
+            start_stih = tonumber(start_stih)
+          end
+          
+          if not do_kraja then
+            -- Оригинална обрада за стандардне опсеге стихова
+            for deo in stihovi:gmatch("[^,]+") do
+              local p1, p2 = deo:match("^(%d+)%-(%d+)$")
+              if p1 and p2 then 
+                for i = tonumber(p1), tonumber(p2) do ciljani[i] = true end
+              else 
+                local b = tonumber(deo)
+                if b then ciljani[b] = true end 
+              end
+            end
           end
 
-          if next(ciljani) then
+          if next(ciljani) or do_kraja then
             local izabrano = {}
+            local pronadjen_pocetak = false
             for _, lin in ipairs(linije) do
               local broj = tonumber(lin:match("^(%d+)%."))  
-              if broj and ciljani[broj] then table.insert(izabrano, lin) end
+              if broj then
+                if do_kraja then
+                  if broj >= start_stih then
+                    pronadjen_pocetak = true
+                    table.insert(izabrano, lin)
+                  end
+                elseif ciljani[broj] then
+                  table.insert(izabrano, lin)
+                end
+              end
             end
 
             if #izabrano > 0 then
