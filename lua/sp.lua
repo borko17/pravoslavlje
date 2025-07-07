@@ -51,9 +51,9 @@ local json_verzija = body:match('"сп"%s*:%s*"(.-)"')
 local json_stajenovo = body:match('"ново"%s*:%s*"(.-)"')
 local json_datum = body:match('"датум"%s*:%s*"(.-)"')
 
-local skript_verzija = "1.0.12"
-local skript_novo = "додата подршка за 'идаље'"
-local skript_datum = "07.07.2025 16:35"
+local skript_verzija = "1.0.13"
+local skript_novo = "додата подршка уноса са заградом"
+local skript_datum = "07.07.2025 21:10"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
 
