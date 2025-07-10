@@ -103,7 +103,7 @@ local function uredi_tekst_u_zagradama(sadrzaj)
   if sadrzaj:match("^%d+$") then
     return "[" .. sadrzaj .. "]"
   else
-    return "\n   [" .. sadrzaj .. "]"
+    return "\n  [" .. sadrzaj .. "]"
   end
 end
 
@@ -635,4 +635,79 @@ end
   local izabrano = {}
 
   if ciljani.do_kraja then
-    -- Handle "идаље" case - show f
+    -- Handle "идаље" case - show from start verse to end of chapter
+    local pronadjen_pocetak = false
+    for _, lin in ipairs(linije) do
+      local broj = tonumber(lin:match("^(%d+)%."))
+      if broj then
+        if broj >= ciljani.start then
+          pronadjen_pocetak = true
+          table.insert(izabrano, lin)
+        end
+      elseif pronadjen_pocetak then
+        table.insert(izabrano, lin)
+      end
+    end
+  else
+    -- Original processing for regular verse ranges
+    local i = 1
+    while i <= #linije do
+      local broj = tonumber(linije[i]:match("^(%d+)%."))
+      if broj and ciljani[broj] then
+        local blok = { linije[i] }
+        i = i + 1
+        while i <= #linije and not linije[i]:match("^%d+%.") do
+          table.insert(blok, linije[i])
+          i = i + 1
+        end
+        table.insert(izabrano, table.concat(blok, "\n"))
+      else
+        i = i + 1
+      end
+    end
+  end
+
+  if #izabrano > 0 then
+    print("------- [" .. podaci.odlomak .. "," .. podaci.stihovi .. "] ---")
+    print((table.concat(izabrano, "\n")):gsub("%[(.-)%]", uredi_tekst_u_zagradama))
+  else
+    print("🚧 Нема " .. podaci.stihovi .. ". стиха у одломку " .. podaci.odlomak)
+    
+    local broj_stihova = 0
+    for _, lin in ipairs(linije) do
+      if lin:match("^%d+%.") then
+        broj_stihova = broj_stihova + 1
+      end
+    end
+
+    print("📘 Одломак " .. podaci.odlomak .. " има " .. broj_sa_imenicom(broj_stihova, "стих", "стиха", "стихова") .. ".")
+  end
+else
+  print("------- [" .. podaci.odlomak .. "] ---")
+  print(tekst:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
+end
+  else
+
+  print("🚧 Није пронађен одломак: " .. podaci.odlomak)
+  local knjiga = podaci.odlomak:match("^(.-)%d+$")
+  if knjiga then
+    local najveca_glava = 0
+    for odlomak, _ in body:gmatch('"(.-)"%s*:%s*"[^"]-"') do
+      local k, broj = odlomak:match("^(.-)(%d+)$")
+      if k == knjiga then
+        local n = tonumber(broj)
+        if n and n > najveca_glava then
+          najveca_glava = n
+        end
+      end
+    end
+    if najveca_glava > 0 then
+      print("📘 Књига " .. knjiga .. " има " .. broj_sa_imenicom(najveca_glava, "главу", "главе", "глава") .. ".")
+    end
+  end
+end
+  end
+  ::continue::
+end
+
+print("-----------\n☦️ С Богом!")
