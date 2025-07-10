@@ -72,9 +72,9 @@ if not nova_verzija or not json_verzija then
 end
 
 -- Твоја локална верзија (постављена ручно)
-local skript_verzija = "1.0.18"
-local skript_novo = "Величина преузетог JSON-а"
-local skript_datum = "10.07.2025 15:08"
+local skript_verzija = "1.0.19"
+local skript_novo = "пречице увучене"
+local skript_datum = "10.07.2025 19:22"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
 
@@ -103,7 +103,7 @@ local function uredi_tekst_u_zagradama(sadrzaj)
   if sadrzaj:match("^%d+$") then
     return "[" .. sadrzaj .. "]"
   else
-    return "\n[" .. sadrzaj .. "]"
+    return "\n   [" .. sadrzaj .. "]"
   end
 end
 
@@ -270,8 +270,10 @@ local function izdvoji_stihove(stihovi_str)
 end
 -- 16
 print("\n📜 СВЕТО ПИСМО 📜")
-print("- Унеси скраћеницу из Светог Писма\n- унеси 'с' за садржај или 'п' за помоћ\n- притисни Ентер за излаз")
-print("Скрипта подржава и уносе на латиници")
+print("Унеси скраћеницу из Светог Писма.")
+print("Унеси 'с' за садржај или 'п' за помоћ.")
+print("Притисни Ентер за излаз")
+print("(Скрипта подржава и уносе на латиници)")
 
 -- 17
 while true do
