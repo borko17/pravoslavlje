@@ -38,7 +38,7 @@ end
 local velicina_bajtova = #body
 -- Децимална величина (MB, 1 MB = 1 000 000)
 local velicina_MB = velicina_bajtova / 1000000
-local zaokruzena_MB = math.floor(velicina_MB * 100 + 0.5) / 100
+local zaokruzena_MB = math.floor(velicina_MB * 10 + 0.5) / 10
 
 print("🏁 Преузето " .. zaokruzena_MB .. " MB")
 
@@ -72,9 +72,9 @@ if not nova_verzija or not json_verzija then
 end
 
 -- Твоја локална верзија (постављена ручно)
-local skript_verzija = "1.0.17"
+local skript_verzija = "1.0.18"
 local skript_novo = "Величина преузетог JSON-а"
-local skript_datum = "10.07.2025 14:25"
+local skript_datum = "10.07.2025 15:08"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
 
