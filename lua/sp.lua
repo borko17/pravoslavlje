@@ -29,14 +29,17 @@ if not body then
   header, body = response:match("(.-\n\n)(.*)")
 end
 
-local etag = header:match("[Ee][Tt]ag:%s*([^\r\n]+)")
+if not body or body == "" then
+  print("⚠️ Грешка: Преузет садржај је празан или неисправан.")
+  return
+end
 
 local velicina_bajtova = #body
 local velicina_MB = velicina_bajtova / (1024 * 1024)
 local velicina_zaokruzena = math.floor(velicina_MB * 100) / 100
 
 print("🏁 Преузето " .. velicina_zaokruzena .. " MB")
----
+
 -- ✅ Провера верзије скрипте и JSON-а
 -- 🔄 Преузми скрипту ради провере нове верзије
 local handle_ver = io.popen('curl -s https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua')
@@ -48,24 +51,34 @@ end
 local skript_body = handle_ver:read("*a")
 handle_ver:close()
 
+if not skript_body or skript_body == "" then
+  print("⚠️ Грешка: Празан одговор при преузимању скрипте.")
+  return
+end
+
 local nova_verzija = skript_body:match('skript_verzija%s*=%s*"([^"]+)"')
 local nova_stajenovo = skript_body:match('skript_novo%s*=%s*"([^"]+)"')
 local nova_datum = skript_body:match('skript_datum%s*=%s*"([^"]+)"')
-
 
 local json_verzija = body:match('"сп"%s*:%s*"(.-)"')
 local json_stajenovo = body:match('"ново"%s*:%s*"(.-)"')
 local json_datum = body:match('"датум"%s*:%s*"(.-)"')
 
-local skript_verzija = "1.0.14"
-local skript_novo = "одговор са сервера ако није пронађен фајл."
-local skript_datum = "10.07.2025 08:44"
+if not nova_verzija or not json_verzija then
+  print("⚠️ Грешка: Није могуће прочитати верзију из скрипте или JSON-а.")
+  return
+end
+
+-- Твоја локална верзија (постављена ручно)
+local skript_verzija = "1.0.16"
+local skript_novo = "подржава и уносе 's,plj' и 's,poslj'."
+local skript_datum = "10.07.2025 09:11"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
 
 local function latinica_u_cirilicu(s)
   -- Ako je unos tačno "plj" ili počinje sa "plj" i posle sledi broj, ne menjaj "lj" u "љ"
-  if not (s == "plj" or s:match("^plj%d") or s == "poslj" or s:match("^poslj%d")) then
+  if not (s == "s,plj" or "plj" or s:match("^plj%d") or s == "s,poslj" or "poslj" or s:match("^poslj%d")) then
     s = s:gsub("lj", "љ")
 end
   s = s:gsub("nj", "њ")
