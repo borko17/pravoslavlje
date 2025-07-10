@@ -103,7 +103,7 @@ local function uredi_tekst_u_zagradama(sadrzaj)
   if sadrzaj:match("^%d+$") then
     return "[" .. sadrzaj .. "]"
   else
-    return "\n   [" .. sadrzaj .. "]"
+    return "\n  [" .. sadrzaj .. "]"
   end
 end
 
