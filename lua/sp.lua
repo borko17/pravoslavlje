@@ -269,7 +269,7 @@ local function izdvoji_stihove(stihovi_str)
   return stihovi
 end
 -- 16
-print("\n📜 СВЕТО ПИСМО 📜")
+print("\n=== СВЕТО ПИСМО ===")
 print("Унеси скраћеницу из Светог Писма.")
 print("Унеси 'с' за садржај или 'п' за помоћ.")
 print("Притисни Ентер за излаз")
