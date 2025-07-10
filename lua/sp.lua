@@ -72,16 +72,16 @@ if not nova_verzija or not json_verzija then
 end
 
 -- Твоја локална верзија (постављена ручно)
-local skript_verzija = "1.0.19"
-local skript_novo = "пречице увучене"
-local skript_datum = "10.07.2025 19:22"
+local skript_verzija = "1.0.21"
+local skript_novo = "Исправљена претрага речи са љ"
+local skript_datum = "10.07.2025 22:37"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
 
 local function latinica_u_cirilicu(s)
   -- Ako je unos tačno "plj" ili počinje sa "plj" i posle sledi broj, ne menjaj "lj" u "љ"
-  if not (s == "s,plj" or "plj" or s:match("^plj%d") or s == "s,poslj" or "poslj" or s:match("^poslj%d")) then
-    s = s:gsub("lj", "љ")
+  if not (s == "plj" or s:match("^plj%d") or s == "poslj" or s:match("^poslj%d") or s == "s,plj" or s:match("^s,plj%d") or s == "s,poslj" or s:match("^s,poslj%d")) then
+  s = s:gsub("lj", "љ")
 end
   s = s:gsub("nj", "њ")
   s = s:gsub("dž", "џ")
@@ -280,7 +280,7 @@ while true do
   io.write("> ")
   local unos = input()
   if not unos or unos == "" then break end
-  print("---------------------------------\nунос: " .. unos .. "\n---------------------------------")
+  print("\n---------------------------------\nунос: " .. unos .. "\n---------------------------------")
 
 -- 18
 local novi_unos
@@ -502,7 +502,7 @@ end
 
 local specijalni_tekst = body:match('"' .. novi_unos .. '"%s*:%s*"([^"]-)"')
 if specijalni_tekst then
-  print("------- [" .. novi_unos .. "] -------")
+  print("\n------- [" .. novi_unos .. "] -------")
   print(specijalni_tekst:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
   goto continue
 end
@@ -592,7 +592,7 @@ end
     for odlomak, tekst in body:gmatch('"(.-)"%s*:%s*"([^"]-)"') do
       if odlomak:lower():match("^" .. knjiga:lower() .. "%d+$") then
        
-        print("------- [" .. odlomak .. "] ---\n" .. tekst:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
+        print("\n------- [" .. odlomak .. "] ---\n" .. tekst:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
         found = true
       end
     end
@@ -668,7 +668,7 @@ end
   end
 
   if #izabrano > 0 then
-    print("------- [" .. podaci.odlomak .. "," .. podaci.stihovi .. "] ---")
+    print("\n------- [" .. podaci.odlomak .. "," .. podaci.stihovi .. "] ---")
     print((table.concat(izabrano, "\n")):gsub("%[(.-)%]", uredi_tekst_u_zagradama))
   else
     print("🚧 Нема " .. podaci.stihovi .. ". стиха у одломку " .. podaci.odlomak)
@@ -683,7 +683,7 @@ end
     print("📘 Одломак " .. podaci.odlomak .. " има " .. broj_sa_imenicom(broj_stihova, "стих", "стиха", "стихова") .. ".")
   end
 else
-  print("------- [" .. podaci.odlomak .. "] ---")
+  print("\n------- [" .. podaci.odlomak .. "] ---")
   print(tekst:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
 end
   else
