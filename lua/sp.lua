@@ -34,11 +34,13 @@ if not body or body == "" then
   return
 end
 
-local velicina_bajtova = #body
-local velicina_MB = velicina_bajtova / (1024 * 1024)
-local velicina_zaokruzena = math.floor(velicina_MB * 100) / 100
 
-print("🏁 Преузето " .. velicina_zaokruzena .. " MB")
+local velicina_bajtova = #body
+-- Децимална величина (MB, 1 MB = 1 000 000)
+local velicina_MB = velicina_bajtova / 1000000
+local zaokruzena_MB = math.floor(velicina_MB * 100 + 0.5) / 100
+
+print("🏁 Преузето " .. zaokruzena_MB .. " MB")
 
 -- ✅ Провера верзије скрипте и JSON-а
 -- 🔄 Преузми скрипту ради провере нове верзије
@@ -70,9 +72,9 @@ if not nova_verzija or not json_verzija then
 end
 
 -- Твоја локална верзија (постављена ручно)
-local skript_verzija = "1.0.16"
-local skript_novo = "подржава и уносе 's,plj' и 's,poslj'."
-local skript_datum = "10.07.2025 09:11"
+local skript_verzija = "1.0.17"
+local skript_novo = "Величина преузетог JSON-а"
+local skript_datum = "10.07.2025 14:25"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
 
@@ -101,7 +103,7 @@ local function uredi_tekst_u_zagradama(sadrzaj)
   if sadrzaj:match("^%d+$") then
     return "[" .. sadrzaj .. "]"
   else
-    return "\n [" .. sadrzaj .. "]"
+    return "\n[" .. sadrzaj .. "]"
   end
 end
 
