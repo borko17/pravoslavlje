@@ -18,6 +18,12 @@ if not response or response == "" then
   return
 end
 
+local status_line = response:match("^(HTTP/%d%.%d %d+ .-)\r?\n")
+if status_line and not status_line:find("200 OK") then
+  print("⚠️ Грешка: није пронађен тражени фајл на серверу → " .. status_line)
+  return
+end
+
 local header, body = response:match("(.-\r?\n\r?\n)(.*)")
 if not body then
   header, body = response:match("(.-\n\n)(.*)")
@@ -51,9 +57,9 @@ local json_verzija = body:match('"сп"%s*:%s*"(.-)"')
 local json_stajenovo = body:match('"ново"%s*:%s*"(.-)"')
 local json_datum = body:match('"датум"%s*:%s*"(.-)"')
 
-local skript_verzija = "1.0.13"
-local skript_novo = "додата подршка уноса са заградом"
-local skript_datum = "07.07.2025 21:10"
+local skript_verzija = "1.0.14"
+local skript_novo = "одговор са сервера ако није пронађен фајл."
+local skript_datum = "10.07.2025 08:44"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
 
