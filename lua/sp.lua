@@ -72,9 +72,9 @@ if not nova_verzija or not json_verzija then
 end
 
 -- Твоја локална верзија (постављена ручно)
-local skript_verzija = "1.0.21"
-local skript_novo = "Исправљена претрага речи са љ"
-local skript_datum = "10.07.2025 22:37"
+local skript_verzija = "1.0.22"
+local skript_novo = "Скраћено правило за садржај у [ загради."
+local skript_datum = "13.07.2025 18:05"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
 
@@ -96,10 +96,6 @@ end
 
 -- 03
 local function uredi_tekst_u_zagradama(sadrzaj)
-  sadrzaj = sadrzaj:gsub(":", ",") -- замени ':' са ','
-  sadrzaj = sadrzaj:gsub("%s*;%s*", "; "):gsub("[^;]%s+", function(r)
-    if r:sub(1,1) ~= ";" then return r:sub(1,1) end
-  end):gsub("; %s+", "; "):lower()
   if sadrzaj:match("^%d+$") then
     return "[" .. sadrzaj .. "]"
   else
