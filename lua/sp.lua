@@ -72,9 +72,9 @@ if not nova_verzija or not json_verzija then
 end
 
 -- Твоја локална верзија (постављена ручно)
-local skript_verzija = "1.0.22"
-local skript_novo = "Скраћено правило за садржај у [ загради."
-local skript_datum = "13.07.2025 18:05"
+local skript_verzija = "1.1.22"
+local skript_novo = "Исправљено правило за унос више глава"
+local skript_datum = "14.07.2025 20:07"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
 
@@ -99,7 +99,7 @@ local function uredi_tekst_u_zagradama(sadrzaj)
   if sadrzaj:match("^%d+$") then
     return "[" .. sadrzaj .. "]"
   else
-    return "\n  [" .. sadrzaj .. "]"
+    return "\n•[" .. sadrzaj .. "]"
   end
 end
 
@@ -219,26 +219,31 @@ else
 end
 
 -- 14
-local function prosiri_opseg(deo)
-    local rezultat = {}
-    local knjiga, prva_glava, poslednja_glava = deo:match("^(%a+)(%d+)%-(%d+)$")
-    if knjiga and prva_glava and poslednja_glava then
-        for i = tonumber(prva_glava), tonumber(poslednja_glava) do
-            table.insert(rezultat, knjiga .. i)
+-- Функција која проширује распон уноса (нпр. ps2-4 → ps2, ps3, ps4)
+local function prosiri_opseg(unos)
+  local rezultati = {}
+
+  for deo in unos:gmatch("[^;%s]+") do
+    -- Прво покушај да нађеш опсег у облику: <ime><broj1>-<broj2>, нпр: 1moj3-5
+    local knjiga, od, dobroj = deo:match("^(.-)(%d+)%-(%d+)$")
+    if knjiga and od and dobroj then
+      local pocetak = tonumber(od)
+      local kraj = tonumber(dobroj)
+      if pocetak and kraj and kraj >= pocetak then
+        for i = pocetak, kraj do
+          table.insert(rezultati, knjiga .. i)
         end
-        return rezultat
-    end
-    
-    local od, do_ = deo:match("^(%d+)%-(%d+)$")
-    if od and do_ then
-        for i = tonumber(od), tonumber(do_) do
-            table.insert(rezultat, tostring(i))
-        end
+      else
+        table.insert(rezultati, deo)
+      end
     else
-        table.insert(rezultat, deo)
+      table.insert(rezultati, deo)
     end
-    return rezultat
+  end
+
+  return rezultati
 end
+
 
 -- 15
 local function izdvoji_stihove(stihovi_str)
@@ -275,6 +280,7 @@ print("(Скрипта подржава и уносе на латиници)")
 while true do
   io.write("> ")
   local unos = input()
+
   if not unos or unos == "" then break end
   print("\n---------------------------------\nунос: " .. unos .. "\n---------------------------------")
 
@@ -285,7 +291,7 @@ if unos:lower():match("^п,") or unos:lower():match("^p,") then
 else
   local delovi = {}
   for deo in unos:gmatch("[^;%s]+") do
-    deo = deo:gsub("^[()†*§%.,!\"'%-\\%[%]]+", ""):gsub("[()†*§%.,!\"'%-\\%[%]]+$", "")
+    deo = deo:gsub("^[()•†*§%.,!\"'%-\\%[%]]+", ""):gsub("[()•†*§%.,!\"'%-\\%[%]]+$", "")
     -- First expand any ranges in the part
     local prosireni = prosiri_opseg(deo)
     for _, p in ipairs(prosireni) do
@@ -664,7 +670,7 @@ end
   end
 
   if #izabrano > 0 then
-    print("\n------- [" .. podaci.odlomak .. "," .. podaci.stihovi .. "] ---")
+    print("------- [" .. podaci.odlomak .. "," .. podaci.stihovi .. "] ---")
     print((table.concat(izabrano, "\n")):gsub("%[(.-)%]", uredi_tekst_u_zagradama))
   else
     print("🚧 Нема " .. podaci.stihovi .. ". стиха у одломку " .. podaci.odlomak)
