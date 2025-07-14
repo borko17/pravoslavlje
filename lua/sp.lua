@@ -72,9 +72,9 @@ if not nova_verzija or not json_verzija then
 end
 
 -- Твоја локална верзија (постављена ручно)
-local skript_verzija = "1.1.22"
+local skript_verzija = "1.1.23"
 local skript_novo = "Исправљено правило за унос више глава"
-local skript_datum = "14.07.2025 20:07"
+local skript_datum = "14.07.2025 20:17"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
 
@@ -320,6 +320,7 @@ if nova_verzija then
     print(github_link)
   else
     print("✔️ Скрипта је ажурна.")
+    print("Шта је ново: " .. nova_stajenovo)
     print("Вријеме измјене: " .. nova_datum)
   end
 else
