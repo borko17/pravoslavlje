@@ -72,9 +72,9 @@ if not nova_verzija or not json_verzija then
 end
 
 -- Твоја локална верзија (постављена ручно)
-local skript_verzija = "1.1.23"
-local skript_novo = "Исправљено правило за унос више глава"
-local skript_datum = "14.07.2025 20:17"
+local skript_verzija = "1.1.24"
+local skript_novo = "..."
+local skript_datum = "15.07.2025 14:17"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
 
@@ -671,7 +671,7 @@ end
   end
 
   if #izabrano > 0 then
-    print("------- [" .. podaci.odlomak .. "," .. podaci.stihovi .. "] ---")
+    print("\n------- [" .. podaci.odlomak .. "," .. podaci.stihovi .. "] ---")
     print((table.concat(izabrano, "\n")):gsub("%[(.-)%]", uredi_tekst_u_zagradama))
   else
     print("🚧 Нема " .. podaci.stihovi .. ". стиха у одломку " .. podaci.odlomak)
