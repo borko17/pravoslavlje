@@ -63,7 +63,6 @@ local nova_stajenovo = skript_body:match('skript_novo%s*=%s*"([^"]+)"')
 local nova_datum = skript_body:match('skript_datum%s*=%s*"([^"]+)"')
 
 local json_verzija = body:match('"сп"%s*:%s*"(.-)"')
-local json_stajenovo = body:match('"ново"%s*:%s*"(.-)"')
 local json_datum = body:match('"датум"%s*:%s*"(.-)"')
 
 if not nova_verzija or not json_verzija then
@@ -72,9 +71,9 @@ if not nova_verzija or not json_verzija then
 end
 
 -- Твоја локална верзија (постављена ручно)
-local skript_verzija = "1.1.24"
-local skript_novo = "..."
-local skript_datum = "15.07.2025 14:17"
+local skript_verzija = "1.1.25"
+local skript_novo = "исправљен баг са појединачним приказом више стихова у низу"
+local skript_datum = "17.07.2025 07:07"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
 
@@ -219,31 +218,26 @@ else
 end
 
 -- 14
--- Функција која проширује распон уноса (нпр. ps2-4 → ps2, ps3, ps4)
-local function prosiri_opseg(unos)
-  local rezultati = {}
-
-  for deo in unos:gmatch("[^;%s]+") do
-    -- Прво покушај да нађеш опсег у облику: <ime><broj1>-<broj2>, нпр: 1moj3-5
-    local knjiga, od, dobroj = deo:match("^(.-)(%d+)%-(%d+)$")
-    if knjiga and od and dobroj then
-      local pocetak = tonumber(od)
-      local kraj = tonumber(dobroj)
-      if pocetak and kraj and kraj >= pocetak then
-        for i = pocetak, kraj do
-          table.insert(rezultati, knjiga .. i)
+local function prosiri_opseg(deo)
+    local rezultat = {}
+    local knjiga, prva_glava, poslednja_glava = deo:match("^(%a+)(%d+)%-(%d+)$")
+    if knjiga and prva_glava and poslednja_glava then
+        for i = tonumber(prva_glava), tonumber(poslednja_glava) do
+            table.insert(rezultat, knjiga .. i)
         end
-      else
-        table.insert(rezultati, deo)
-      end
-    else
-      table.insert(rezultati, deo)
+        return rezultat
     end
-  end
-
-  return rezultati
+    
+    local od, do_ = deo:match("^(%d+)%-(%d+)$")
+    if od and do_ then
+        for i = tonumber(od), tonumber(do_) do
+            table.insert(rezultat, tostring(i))
+        end
+    else
+        table.insert(rezultat, deo)
+    end
+    return rezultat
 end
-
 
 -- 15
 local function izdvoji_stihove(stihovi_str)
@@ -306,7 +300,6 @@ end
 if novi_unos == "v" or novi_unos == "в" then
     print("\n== Свето Писмо ==")
     print("Верзија Светог Писма: " .. json_verzija)
-    print("Шта је ново: " .. json_stajenovo)
     print("Вријеме измјене: " .. json_datum)
     print("\n== Скрипта ==")
     print("Верзија скрипте: " .. skript_verzija)
@@ -320,7 +313,6 @@ if nova_verzija then
     print(github_link)
   else
     print("✔️ Скрипта је ажурна.")
-    print("Шта је ново: " .. nova_stajenovo)
     print("Вријеме измјене: " .. nova_datum)
   end
 else
