@@ -71,9 +71,9 @@ if not nova_verzija or not json_verzija then
 end
 
 -- Твоја локална верзија (постављена ручно)
-local skript_verzija = "1.1.25"
-local skript_novo = "исправљен баг са појединачним приказом више стихова у низу"
-local skript_datum = "17.07.2025 07:07"
+local skript_verzija = "1.1.26"
+local skript_novo = "ситне исправке"
+local skript_datum = "18.07.2025 13:35"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
 
@@ -705,4 +705,4 @@ end
   ::continue::
 end
 
-print("-----------\n☦️ С Богом!")
+print("\n-----------\n☦️ С Богом!")
