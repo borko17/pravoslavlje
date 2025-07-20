@@ -71,9 +71,9 @@ if not nova_verzija or not json_verzija then
 end
 
 -- Твоја локална верзија (постављена ручно)
-local skript_verzija = "1.1.26"
-local skript_novo = "ситне исправке"
-local skript_datum = "18.07.2025 13:35"
+local skript_verzija = "1.1.27"
+local skript_novo = "исправљена грешка 'и даље'"
+local skript_datum = "20.07.2025 20:15"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
 
@@ -244,7 +244,7 @@ local function izdvoji_stihove(stihovi_str)
   local stihovi = {}
   for deo in stihovi_str:gmatch("[^,]+") do
     -- Add support for "идаље" (e.g., "6идаље")
-    local start_stih = deo:match("^(%d+)идаље$")
+    local start_stih = deo:match("^(%d+)_и_даље$")
     if start_stih then
       return {start=tonumber(start_stih), do_kraja=true}
     end
