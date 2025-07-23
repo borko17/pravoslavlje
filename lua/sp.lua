@@ -71,9 +71,9 @@ if not nova_verzija or not json_verzija then
 end
 
 -- Твоја локална верзија (постављена ручно)
-local skript_verzija = "1.1.27"
-local skript_novo = "исправљена грешка 'и даље'"
-local skript_datum = "20.07.2025 20:15"
+local skript_verzija = "1.1.28"
+local skript_novo = "Додата подршка за + (и даље)"
+local skript_datum = "23.07.2025 13:25"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
 
@@ -242,26 +242,33 @@ end
 -- 15
 local function izdvoji_stihove(stihovi_str)
   local stihovi = {}
+  local do_kraja = nil
+  
   for deo in stihovi_str:gmatch("[^,]+") do
-    -- Add support for "идаље" (e.g., "6идаље")
-    local start_stih = deo:match("^(%d+)_и_даље$")
-    if start_stih then
-      return {start=tonumber(start_stih), do_kraja=true}
-    end
-    
-    local od, do_ = deo:match("^(%d+)%-(%d+)$")
-    if od and do_ then
-      for i = tonumber(od), tonumber(do_) do 
-        stihovi[i] = true 
-      end
+    -- Proveri da li je deo u formatu "15+"
+    local plus_oznaka = deo:match("^(%d+)%+$")
+    if plus_oznaka then
+      do_kraja = tonumber(plus_oznaka)
     else
-      local n = tonumber(deo)
-      if n then 
-        stihovi[n] = true 
+      -- Procesuiraj standardne opsege (4, 15-22, itd.)
+      local od, do_ = deo:match("^(%d+)%-(%d+)$")
+      if od and do_ then
+        for i = tonumber(od), tonumber(do_) do
+          stihovi[i] = true
+        end
+      else
+        local n = tonumber(deo)
+        if n then
+          stihovi[n] = true
+        end
       end
     end
   end
-  return stihovi
+  
+  return {
+    stihovi = stihovi,
+    do_kraja = do_kraja
+  }
 end
 -- 16
 print("\n=== СВЕТО ПИСМО ===")
@@ -626,41 +633,44 @@ end
     end
 
     if podaci.stihovi then
-  local ciljani = izdvoji_stihove(podaci.stihovi)
-  local izabrano = {}
+local ciljani = izdvoji_stihove(podaci.stihovi)
+local izabrano = {}
 
-  if ciljani.do_kraja then
-    -- Handle "идаље" case - show from start verse to end of chapter
-    local pronadjen_pocetak = false
-    for _, lin in ipairs(linije) do
-      local broj = tonumber(lin:match("^(%d+)%."))
-      if broj then
-        if broj >= ciljani.start then
-          pronadjen_pocetak = true
+-- Prvo dodaj sve eksplicitno navedene stihove
+local i = 1
+while i <= #linije do
+  local broj = tonumber(linije[i]:match("^(%d+)%."))
+  if broj and ciljani.stihovi[broj] then
+    local blok = { linije[i] }
+    i = i + 1
+    while i <= #linije and not linije[i]:match("^%d+%.") do
+      table.insert(blok, linije[i])
+      i = i + 1
+    end
+    table.insert(izabrano, table.concat(blok, "\n"))
+  else
+    i = i + 1
+  end
+end
+
+-- Zatim dodaj sve stihove od "do_kraja" do kraja poglavlja
+if ciljani.do_kraja then
+  local pronadjen_pocetak = false
+  for _, lin in ipairs(linije) do
+    local broj = tonumber(lin:match("^(%d+)%."))
+    if broj then
+      if broj >= ciljani.do_kraja then
+        pronadjen_pocetak = true
+        -- Proveri da li smo već dodali ovaj stih u prvom delu
+        if not ciljani.stihovi[broj] then
           table.insert(izabrano, lin)
         end
-      elseif pronadjen_pocetak then
-        table.insert(izabrano, lin)
       end
-    end
-  else
-    -- Original processing for regular verse ranges
-    local i = 1
-    while i <= #linije do
-      local broj = tonumber(linije[i]:match("^(%d+)%."))
-      if broj and ciljani[broj] then
-        local blok = { linije[i] }
-        i = i + 1
-        while i <= #linije and not linije[i]:match("^%d+%.") do
-          table.insert(blok, linije[i])
-          i = i + 1
-        end
-        table.insert(izabrano, table.concat(blok, "\n"))
-      else
-        i = i + 1
-      end
+    elseif pronadjen_pocetak then
+      table.insert(izabrano, lin)
     end
   end
+end
 
   if #izabrano > 0 then
     print("\n------- [" .. podaci.odlomak .. "," .. podaci.stihovi .. "] ---")
