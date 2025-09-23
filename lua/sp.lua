@@ -71,9 +71,9 @@ if not nova_verzija or not json_verzija then
 end
 
 -- Твоја локална верзија (постављена ручно)
-local skript_verzija = "1.1.28"
-local skript_novo = "Додата подршка за + (и даље)"
-local skript_datum = "23.07.2025 13:25"
+local skript_verzija = "1.2.0"
+local skript_novo = "Додато питање у насумични стих"
+local skript_datum = "23.08.2025 18:25"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
 
@@ -333,7 +333,7 @@ end
 -- testend
 
 -- 19
--- 📜 Насумичан стих: ако је 'r' или 'р'
+-- 📜 Насумичан стих:
 if novi_unos == "n" or novi_unos == "н" then
   local odlomci = {}
   for odlomak, tekst in body:gmatch('"(.-)"%s*:%s*"([^"]-)"') do
@@ -364,11 +364,16 @@ if novi_unos == "n" or novi_unos == "н" then
   local max_start = math.max(1, #linije - 2)
   local start_index = math.random(max_start)
 
-  print("---------------------------------\n🎲 Насумични стихови: [" .. nasumicni.odlomak .. "]\n---------------------------------")
+  print("---------------------------------\n🎲⁉️ Из које књиге/главе су ови насумични стихови:\n---------------------------------")
   for i = start_index, math.min(start_index + 2, #linije) do
     local stih = linije[i]
     print(stih:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
   end
+  print("---------------------------------\nЗа одговор стисни Ентер.")
+local unos = input()
+if unos == "" then
+  print("\n📜 Одговор: [" .. nasumicni.odlomak .. "]")
+end
   goto continue
 end
 
