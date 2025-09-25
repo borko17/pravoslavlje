@@ -72,7 +72,7 @@ end
 
 -- Твоја локална верзија (постављена ручно)
 local skript_verzija = "1.2.2"
-local skript_novo = "Исправљена грешка за унос више глава које почињу са бројем"
+local skript_novo = "Исправљена грешка за унос више глава књиге чији назив почиње са бројем"
 local skript_datum = "25.08.2025 7:20"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
