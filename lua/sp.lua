@@ -71,9 +71,9 @@ if not nova_verzija or not json_verzija then
 end
 
 -- Твоја локална верзија (постављена ручно)
-local skript_verzija = "1.2.1"
-local skript_novo = "fix_utf8"
-local skript_datum = "24.08.2025 18:20"
+local skript_verzija = "1.2.2"
+local skript_novo = "Исправљена грешка за унос више глава које почињу са бројем"
+local skript_datum = "25.08.2025 7:20"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
 
@@ -220,7 +220,7 @@ end
 -- 14
 local function prosiri_opseg(deo)
     local rezultat = {}
-    local knjiga, prva_glava, poslednja_glava = deo:match("^(%a+)(%d+)%-(%d+)$")
+    local knjiga, prva_glava, poslednja_glava = deo:match("^([%d%aА-Яа-яЈјЉЊЋЏ]+)(%d+)%-(%d+)$")
     if knjiga and prva_glava and poslednja_glava then
         for i = tonumber(prva_glava), tonumber(poslednja_glava) do
             table.insert(rezultat, knjiga .. i)
