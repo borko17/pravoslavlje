@@ -71,9 +71,9 @@ if not nova_verzija or not json_verzija then
 end
 
 -- Твоја локална верзија (постављена ручно)
-local skript_verzija = "1.2.3"
-local skript_novo = "Исправљена грешка исписа за унос више одломака у низу"
-local skript_datum = "27.09.2025 21:10"
+local skript_verzija = "1.3.0"
+local skript_novo = "Исправљен буг уноса ћирилицом"
+local skript_datum = "30.09.2025 21:30"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 -- 02
 
@@ -185,82 +185,61 @@ local function izvuci_pocetak_knjige(deo)
 end
 
 -- 13
--- ПРОСИРИ ОПСЕГ (робусно, ради за UTF-8 и за случајеве као: mt1-3, 1moj10-13, 10-13)
+local function prosiri_alias(ulaz)
+  local rezultat, poslednja_knjiga = {}, nil
+  for deo in ulaz:gmatch("[^;%s]+") do
+    local pocetak_knjige = izvuci_pocetak_knjige(deo)
+    local ostatak = deo:sub(#pocetak_knjige + 1)
+    local knjiga = latinica_u_cirilicu(pocetak_knjige)
+
+    -- Ако је књига са једном главом
+    if knjige_sa_jednom_glavom[knjiga] then
+  if ostatak == "" then
+    table.insert(rezultat, knjiga .. "1")
+  elseif ostatak:match("^%d") then
+    table.insert(rezultat, knjiga .. "," .. ostatak)
+  else
+    table.insert(rezultat, knjiga .. ostatak)
+  end
+else
+     if pocetak_knjige ~= "" and pocetak_knjige:match("[%aА-Яа-яЈјЉЊЋЏ]") then
+        poslednja_knjiga = knjiga
+        table.insert(rezultat, knjiga .. ostatak)
+else
+     if poslednja_knjiga then
+          table.insert(rezultat, poslednja_knjiga .. deo)
+     else
+          table.insert(rezultat, deo)
+        end
+      end
+    end
+  end
+  return rezultat
+end
+
+-- 14
 local function prosiri_opseg(deo)
     local rezultat = {}
 
-    -- уклони евентуалне спољашње размаке
-    deo = deo:gsub("^%s*(.-)%s*$", "%1")
+    -- користимо постојећу функцију да извучемо "књигу"
+    local knjiga = izvuci_pocetak_knjige(deo)
+    local ostatak = deo:sub(#knjiga + 1)
 
-    -- случај: префикс (било шта) + цифре-цифре (негативни захват префикса)
-    -- користимо непохлепан захват (.-) да бисмо сачували префикс исправно
-    local knjiga, prva, poslednja = deo:match("^(.-)(%d+)%-(%d+)$")
-    if knjiga and prva and poslednja and knjiga ~= "" then
-        local od = tonumber(prva)
-        local do_ = tonumber(poslednja)
-        if od and do_ and od <= do_ then
-            for i = od, do_ do
-                table.insert(rezultat, knjiga .. tostring(i))
-            end
-            return rezultat
+    local prva_glava, poslednja_glava = ostatak:match("^(%d+)%-(%d+)$")
+    if knjiga ~= "" and prva_glava and poslednja_glava then
+        for i = tonumber(prva_glava), tonumber(poslednja_glava) do
+            table.insert(rezultat, knjiga .. i)
         end
+        return rezultat
     end
 
-    -- случај: само бројеви-опсег (нпр. 10-13)
-    local od2, do2 = deo:match("^(%d+)%-(%d+)$")
-    if od2 and do2 then
-        local od = tonumber(od2)
-        local do_ = tonumber(do2)
-        if od and do_ and od <= do_ then
-            for i = od, do_ do
-                table.insert(rezultat, tostring(i))
-            end
-            return rezultat
+    local od, do_ = deo:match("^(%d+)%-(%d+)$")
+    if od and do_ then
+        for i = tonumber(od), tonumber(do_) do
+            table.insert(rezultat, tostring(i))
         end
-    end
-
-    -- иначе врати како је унето
-    table.insert(rezultat, deo)
-    return rezultat
-end
-
--- ПРОСИРИ АЛИАС (враћа низ делова; користи izvuci_pocetak_knjige и зна за књиге са 1 главом)
-local function prosiri_alias(ulaz)
-    local rezultat, poslednja_knjiga = {}, nil
-    for deo in ulaz:gmatch("[^;%s]+") do
-        -- очисти евентуалне знакове са крајева
-        deo = deo:gsub("^[()•†*§%.,!\"'%-\\%[%]]+", ""):gsub("[()•†*§%.,!\"'%-\\%[%]]+$", "")
-
-        local pocetak_knjige = izvuci_pocetak_knjige(deo)           -- npr. "1moj" или "пс" или "суд"
-        local ostatak = deo:sub(#pocetak_knjige + 1)                -- шта следи после имена књиге
-        local knjiga = latinica_u_cirilicu(pocetak_knjige)         -- нормализуј име књиге
-
-        -- Ако је књига која има само једну главу (стих се пише као број):
-        if knjige_sa_jednom_glavom[knjiga] then
-            if ostatak == "" then
-                table.insert(rezultat, knjiga .. "1")
-            else
-                -- ако остaтак почиње цифром, третирај га као СТИХОВЕ (уноси: 10-15 -> ,10-15)
-                if ostatak:match("^%d") then
-                    table.insert(rezultat, knjiga .. "," .. ostatak)
-                else
-                    table.insert(rezultat, knjiga .. ostatak)
-                end
-            end
-        else
-            -- ако је pocetak_knjige садржао писмену ознаку (име књиге)
-            if pocetak_knjige ~= "" and pocetak_knjige:match("[%aА-Яа-яЈјЉЊЋЏ]") then
-                poslednja_knjiga = knjiga
-                table.insert(rezultat, knjiga .. ostatak)
-            else
-                -- ако није наведено име књиге, користи последњу књигу (нпр. "1-3" након претходне књиге)
-                if poslednja_knjiga then
-                    table.insert(rezultat, poslednja_knjiga .. deo)
-                else
-                    table.insert(rezultat, deo)
-                end
-            end
-        end
+    else
+        table.insert(rezultat, deo)
     end
     return rezultat
 end
@@ -316,13 +295,15 @@ local novi_unos
 if unos:lower():match("^п,") or unos:lower():match("^p,") then
   novi_unos = latinica_u_cirilicu(unos)
 else
-  local delovi = {}for deo in unos:gmatch("[^;%s]+") do
-  deo = deo:gsub("^[()•†*§%.,!\"'%-\\%[%]]+", ""):gsub("[()•†*§%.,!\"'%-\\%[%]]+$", "")
-  -- ❌ Nemoj ovdje širiti opsege za stihove
-  table.insert(delovi, deo)
-end
-
-  
+  local delovi = {}
+  for deo in unos:gmatch("[^;%s]+") do
+    deo = deo:gsub("^[()•†*§%.,!\"'%-\\%[%]]+", ""):gsub("[()•†*§%.,!\"'%-\\%[%]]+$", "")
+    -- First expand any ranges in the part
+    local prosireni = prosiri_opseg(deo)
+    for _, p in ipairs(prosireni) do
+      table.insert(delovi, p)
+    end
+  end
   local ociscen_unos = table.concat(delovi, ";")
   novi_unos = latinica_u_cirilicu(ociscen_unos)
 end
@@ -722,8 +703,6 @@ end
   if #izabrano > 0 then
     print("\n------- [" .. podaci.odlomak .. "," .. podaci.stihovi .. "] ---")
     print((table.concat(izabrano, "\n")):gsub("%[(.-)%]", uredi_tekst_u_zagradama))
-
-
   else
     print("🚧 Нема " .. podaci.stihovi .. ". стиха у одломку " .. podaci.odlomak)
     
