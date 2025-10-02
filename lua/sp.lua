@@ -648,33 +648,6 @@ if novi_unos:match("^с,") then
 
   goto continue
 end
--- 22b
--- 📖 Режим читања (минимално чишћење: само [] и *)
-if novi_unos:match("^ч,") then
-  local odlomak = novi_unos:sub(4) -- после "ч,"
-  local tekst = body:match('"' .. odlomak .. '"%s*:%s*"([^"]-)"')
-
-  if tekst then
-    local cist = {}
-    for lin in tekst:gmatch("[^\r\n]+") do
-      -- уклони садржај у угластим заградама (са самим заградама)
-      local bez = lin:gsub("%b[]", "")
-      -- уклони звездицу
-      bez = bez:gsub("%*", "")
-      bez = bez:gsub("%•", "")
-      bez = bez:gsub("%†", "")
-      table.insert(cist, bez)
-    end
-
-    print("---------------------------------\n📖 Режим читања: [" .. odlomak .. "]\n---------------------------------")
-    -- испиши ред по ред, без икаквог додатног обрађивања
-    print(table.concat(cist, "\n"))
-  else
-    print("🚧 Није пронађен одломак: " .. odlomak)
-  end
-  goto continue
-end
-
 
 -- 23
   -- 📘 Приказ свих глава у књизи ако унос није конкретан стих
