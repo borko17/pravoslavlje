@@ -71,10 +71,28 @@ if not nova_verzija or not json_verzija then
 end
 
 -- Твоја локална верзија (постављена ручно)
-local skript_verzija = "1.3.0"
-local skript_novo = "Исправљен буг уноса ћирилицом"
-local skript_datum = "30.09.2025 21:30"
+local skript_verzija = "1.3.1"
+local skript_novo = "Опција укључивања повезница у угластим заградама."
+local skript_datum = "2.10.2025 20:22"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
+
+local global_read_mode = true
+
+local function procisti_za_citanje(tekst)
+  local cist = {}
+  for lin in (tekst .. "\n"):gmatch("([^\r\n]*)\r?\n") do
+    local bez = lin:gsub("%b[]", "")
+      -- уклони звездицу
+      bez = bez:gsub("%*", "")
+      bez = bez:gsub("%•", "")
+      bez = bez:gsub("%†", "")
+      table.insert(cist, bez)
+    end
+  return table.concat(cist, "\n")
+end
+
+
+
 -- 02
 
 local function latinica_u_cirilicu(s)
@@ -308,6 +326,17 @@ else
   novi_unos = latinica_u_cirilicu(ociscen_unos)
 end
 
+-- ✅ Komande za globalni režim čitanja
+if novi_unos == "чит" then
+  global_read_mode = true
+  print("Укључен је режим читања.")
+  goto continue
+elseif novi_unos == "пов" then
+  global_read_mode = false
+  print("Укључене су повезнице.")
+  goto continue
+end
+
 -- tekst
 if novi_unos == "v" or novi_unos == "в" then
     print("\n== Свето Писмо ==")
@@ -330,12 +359,11 @@ if nova_verzija then
 else
   print("ℹ️ Није могуће одредити последњу верзију скрипте са GitHub-а.")
 end
-
   print("\n== lua ==")
     print("Тренутно користите lua верзију:\n" .. _VERSION .."\n\nСкрипта је тестирана на:\nLuaj-jse 3.0.1\nYantra CLI Launcher Pro")
     goto continue
 end
--- testend
+
 
 -- 19
 -- 📜 Насумичан стих:
@@ -515,8 +543,13 @@ if novi_unos:match("^п[,#]") then
         end
         os.execute("sleep 2") -- za Linux/macOS
         for _, r in ipairs(rezultati) do
-            print("[" .. r.odlomak .. "," .. r.broj_stiha .. "] " .. r.tekst:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
-        end
+    if global_read_mode then
+        print("[" .. r.odlomak .. "," .. r.broj_stiha .. "] " .. procisti_za_citanje(r.tekst))
+    else
+        print("[" .. r.odlomak .. "," .. r.broj_stiha .. "] " .. r.tekst:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
+    end
+end
+
     end
 
     goto continue
@@ -528,7 +561,11 @@ end
 local specijalni_tekst = body:match('"' .. novi_unos .. '"%s*:%s*"([^"]-)"')
 if specijalni_tekst then
   print("\n------- [" .. novi_unos .. "] -------")
+  if global_read_mode then
+  print(procisti_za_citanje(specijalni_tekst))
+else
   print(specijalni_tekst:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
+end
   goto continue
 end
 
@@ -611,6 +648,33 @@ if novi_unos:match("^с,") then
 
   goto continue
 end
+-- 22b
+-- 📖 Режим читања (минимално чишћење: само [] и *)
+if novi_unos:match("^ч,") then
+  local odlomak = novi_unos:sub(4) -- после "ч,"
+  local tekst = body:match('"' .. odlomak .. '"%s*:%s*"([^"]-)"')
+
+  if tekst then
+    local cist = {}
+    for lin in tekst:gmatch("[^\r\n]+") do
+      -- уклони садржај у угластим заградама (са самим заградама)
+      local bez = lin:gsub("%b[]", "")
+      -- уклони звездицу
+      bez = bez:gsub("%*", "")
+      bez = bez:gsub("%•", "")
+      bez = bez:gsub("%†", "")
+      table.insert(cist, bez)
+    end
+
+    print("---------------------------------\n📖 Режим читања: [" .. odlomak .. "]\n---------------------------------")
+    -- испиши ред по ред, без икаквог додатног обрађивања
+    print(table.concat(cist, "\n"))
+  else
+    print("🚧 Није пронађен одломак: " .. odlomak)
+  end
+  goto continue
+end
+
 
 -- 23
   -- 📘 Приказ свих глава у књизи ако унос није конкретан стих
@@ -622,7 +686,13 @@ end
     for odlomak, tekst in body:gmatch('"(.-)"%s*:%s*"([^"]-)"') do
       if odlomak:lower():match("^" .. knjiga:lower() .. "%d+$") then
        
-        print("\n------- [" .. odlomak .. "] ---\n" .. tekst:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
+        print("\n------- [" .. odlomak .. "] ---")
+if global_read_mode then
+  print(procisti_za_citanje(tekst))
+else
+  print(tekst:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
+end
+
         found = true
       end
     end
@@ -702,7 +772,12 @@ end
 
   if #izabrano > 0 then
     print("\n------- [" .. podaci.odlomak .. "," .. podaci.stihovi .. "] ---")
-    print((table.concat(izabrano, "\n")):gsub("%[(.-)%]", uredi_tekst_u_zagradama))
+    if global_read_mode then
+  print(procisti_za_citanje(table.concat(izabrano, "\n")))
+else
+  print((table.concat(izabrano, "\n")):gsub("%[(.-)%]", uredi_tekst_u_zagradama))
+end
+
   else
     print("🚧 Нема " .. podaci.stihovi .. ". стиха у одломку " .. podaci.odlomak)
     
@@ -717,7 +792,12 @@ end
   end
 else
   print("\n------- [" .. podaci.odlomak .. "] ---")
+ if global_read_mode then
+  print(procisti_za_citanje(tekst))
+else
   print(tekst:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
+end
+
 end
   else
 
