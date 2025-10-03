@@ -1,12 +1,12 @@
 
 -- 01
-print("📥 Преузимање Светог Писма...")
+print("Преузимање Светог Писма...")
 
 local handle = io.popen(
   'curl -s -D - https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/sveto_pismo.json')
 
 if not handle then
-  print("🚫 Грешка: Није могуће покренути 'curl'.")
+  print("Грешка: Није могуће покренути 'curl'.")
   return
 end
 
@@ -14,13 +14,13 @@ local response = handle:read("*a")
 handle:close()
 
 if not response or response == "" then
-  print("🚫 Грешка: Није могуће преузети Свето Писмо. Провјерите интернет конекцију.")
+  print("Грешка: Није могуће преузети Свето Писмо. Провјерите интернет конекцију.")
   return
 end
 
 local status_line = response:match("^(HTTP/%d%.%d %d+ .-)\r?\n")
 if status_line and not status_line:find("200 OK") then
-  print("⚠️ Грешка: није пронађен тражени фајл на серверу → " .. status_line)
+  print("Грешка: није пронађен тражени фајл на серверу → " .. status_line)
   return
 end
 
@@ -30,7 +30,7 @@ if not body then
 end
 
 if not body or body == "" then
-  print("⚠️ Грешка: Преузет садржај је празан или неисправан.")
+  print("Грешка: Преузет садржај је празан или неисправан.")
   return
 end
 
@@ -40,13 +40,13 @@ local velicina_bajtova = #body
 local velicina_MB = velicina_bajtova / 1000000
 local zaokruzena_MB = math.floor(velicina_MB * 10 + 0.5) / 10
 
-print("🏁 Преузето " .. zaokruzena_MB .. " MB")
+print("Преузето " .. zaokruzena_MB .. " MB")
 
--- ✅ Провера верзије скрипте и JSON-а
--- 🔄 Преузми скрипту ради провере нове верзије
+-- Провера верзије скрипте и JSON-а
+-- Преузми скрипту ради провере нове верзије
 local handle_ver = io.popen('curl -s https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua')
 if not handle_ver then
-  print("⚠️ Грешка при преузимању скрипте за проверу верзије.")
+  print("Грешка при преузимању скрипте за проверу верзије.")
   return
 end
 
@@ -54,7 +54,7 @@ local skript_body = handle_ver:read("*a")
 handle_ver:close()
 
 if not skript_body or skript_body == "" then
-  print("⚠️ Грешка: Празан одговор при преузимању скрипте.")
+  print("Грешка: Празан одговор при преузимању скрипте.")
   return
 end
 
@@ -66,14 +66,14 @@ local json_verzija = body:match('"сп"%s*:%s*"(.-)"')
 local json_datum = body:match('"датум"%s*:%s*"(.-)"')
 
 if not nova_verzija or not json_verzija then
-  print("⚠️ Грешка: Није могуће прочитати верзију из скрипте или JSON-а.")
+  print("Грешка: Није могуће прочитати верзију из скрипте или JSON-а.")
   return
 end
 
 -- Твоја локална верзија (постављена ручно)
-local skript_verzija = "1.3.1"
-local skript_novo = "Опција укључивања повезница у угластим заградама."
-local skript_datum = "2.10.2025 20:22"
+local skript_verzija = "1.3.2"
+local skript_novo = "Без иконица."
+local skript_datum = "3.10.2025 8:02"
 local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
 
 local global_read_mode = true
@@ -326,7 +326,7 @@ else
   novi_unos = latinica_u_cirilicu(ociscen_unos)
 end
 
--- ✅ Komande za globalni režim čitanja
+-- Кomande za globalni režim čitanja
 if novi_unos == "чит" then
   global_read_mode = true
   print("Укључен је режим читања.")
@@ -346,18 +346,18 @@ if novi_unos == "v" or novi_unos == "в" then
     print("Верзија скрипте: " .. skript_verzija)
 if nova_verzija then
   if nova_verzija ~= skript_verzija then
-    print("⚠️ Скрипта није ажурна.")
+    print("Скрипта није ажурна.")
     print("Последња верзија: " .. nova_verzija)
     print("Шта је ново: " .. nova_stajenovo)
     print("Вријеме измјене: " .. nova_datum)
-    print("\n🔗 Преузми нову верзију са:")
+    print("\nПреузми нову верзију са:")
     print(github_link)
   else
-    print("✔️ Скрипта је ажурна.")
+    print("✔ Скрипта је ажурна.")
     print("Вријеме измјене: " .. nova_datum)
   end
 else
-  print("ℹ️ Није могуће одредити последњу верзију скрипте са GitHub-а.")
+  print("Није могуће одредити последњу верзију скрипте са GitHub-а.")
 end
   print("\n== lua ==")
     print("Тренутно користите lua верзију:\n" .. _VERSION .."\n\nСкрипта је тестирана на:\nLuaj-jse 3.0.1\nYantra CLI Launcher Pro")
@@ -366,7 +366,7 @@ end
 
 
 -- 19
--- 📜 Насумичан стих:
+-- Насумичан стих:
 if novi_unos == "n" or novi_unos == "н" then
   local odlomci = {}
   for odlomak, tekst in body:gmatch('"(.-)"%s*:%s*"([^"]-)"') do
@@ -376,7 +376,7 @@ if novi_unos == "n" or novi_unos == "н" then
   end
   
   if #odlomci == 0 then
-    print("🚧 Није пронађен ниједан валидан одломак.")
+    print("Није пронађен ниједан валидан одломак.")
     goto continue
   end
   
@@ -389,7 +389,7 @@ if novi_unos == "n" or novi_unos == "н" then
   end
 
   if #linije == 0 then
-    print("🚧 Одломак нема стихове.")
+    print("Одломак нема стихове.")
     goto continue
   end
 
@@ -397,7 +397,7 @@ if novi_unos == "n" or novi_unos == "н" then
   local max_start = math.max(1, #linije - 2)
   local start_index = math.random(max_start)
 
-  print("---------------------------------\n🎲 Из које књиге су ови стихови?\n---------------------------------")
+  print("---------------------------------\nИз које књиге су ови стихови?\n---------------------------------")
   for i = start_index, math.min(start_index + 2, #linije) do
     local stih = linije[i]
     print(stih:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
@@ -405,7 +405,7 @@ if novi_unos == "n" or novi_unos == "н" then
   print("---------------------------------\nЗа одговор стисни Ентер.")
 local unos = input()
 if unos == "" then
-  print("\n📜 Одговор: [" .. nasumicni.odlomak .. "]")
+  print("\nОдговор: [" .. nasumicni.odlomak .. "]")
   local sve_linije = {}
   for lin in nasumicni.tekst:gmatch("[^\r\n]+") do
     table.insert(sve_linije, lin)
@@ -424,7 +424,7 @@ end
 end
 
 
--- 📖 Претрага више речи или фразе
+-- Претрага више речи или фразе
 -- Dodaj listu odlomaka koje želimo izuzeti iz pretrage
 local izuzeti_odlomci = {
     ["с"] = true,  -- изузимам садржај
@@ -436,7 +436,7 @@ if novi_unos:match("^п[,#]") then
     local deo = novi_unos:sub(is_phrase_search and 4 or 3)
     print("🔍 Претрага је у току...")
     if not deo or deo:match("^%s*$") then
-        print("⚠️ Унесите бар једну ријеч или фразу за претрагу.")
+        print("Унесите бар једну ријеч или фразу за претрагу.")
         goto continue
     end
 
@@ -466,7 +466,7 @@ if novi_unos:match("^п[,#]") then
     -- [исти код као претходно]
 
     if #search_terms == 0 then
-        print("⚠️ Нисте унели ниједну важећу ријеч или фразу.")
+        print("Нисте унели ниједну важећу ријеч или фразу.")
         goto continue
     end
 
@@ -531,9 +531,9 @@ if novi_unos:match("^п[,#]") then
 
     if ukupan_broj == 0 then
         if is_phrase_search then
-            print("🚫 Није пронађен ниједан стих са фразом: '" .. search_terms[1] .. "'")
+            print("Није пронађен ниједан стих са фразом: '" .. search_terms[1] .. "'")
         else
-            print("🚫 Није пронађен ниједан стих са ријечима: '" .. table.concat(search_terms, "', '") .. "'")
+            print("Није пронађен ниједан стих са ријечима: '" .. table.concat(search_terms, "', '") .. "'")
         end
     else
         if is_phrase_search then
@@ -599,7 +599,7 @@ if novi_unos:match("^с,") then
     end
 
     if tekst then
-      print("---------------------------------\n📖 Садржај за књигу: " .. knjiga .. "\n---------------------------------")
+      print("---------------------------------\nСадржај за књигу: " .. knjiga .. "\n---------------------------------")
       -- Count verses
       local broj_stihova = 0
       for lin in tekst:gmatch("[^\r\n]+") do
@@ -610,7 +610,7 @@ if novi_unos:match("^с,") then
       local naslov = tekst:match("Глава%s+1%.%s*(.-)\n") or tekst:match("Наслов%s*:%s*(.-)\n") or "Нема наслова"
       print("Глава 1. (" .. broj_stihova .. " стихова)\n" .. naslov)
     else
-      print("🚧 Није пронађен садржај за књигу: " .. knjiga)
+      print("Није пронађен садржај за књигу: " .. knjiga)
     end
 
   else
@@ -633,7 +633,7 @@ if novi_unos:match("^с,") then
         end
         if naslov then
           if not pronadjeno then
-            print("---------------------------------\n📖 Садржај за књигу: " .. knjiga .. "\n---------------------------------")
+            print("---------------------------------\nСадржај за књигу: " .. knjiga .. "\n---------------------------------")
           end
           local oznaka = (knjiga == "пс" and "Псалам" or "Глава")
           print(oznaka .. " " .. broj .. ". (" .. broj_sa_imenicom(broj_stihova, "стих", "стиха", "стихова") .. ")\n" .. naslov)
@@ -642,7 +642,7 @@ if novi_unos:match("^с,") then
       end
     end
     if not pronadjeno then
-      print("🚧 Није пронађен садржај за књигу: " .. knjiga)
+      print("Није пронађен садржај за књигу: " .. knjiga)
     end
   end
 
@@ -670,7 +670,7 @@ end
       end
     end
     if not found then
-      print("🚧 Није пронађена књига: " .. knjiga)
+      print("Није пронађена књига: " .. knjiga)
     end
     goto continue
   end
@@ -752,7 +752,7 @@ else
 end
 
   else
-    print("🚧 Нема " .. podaci.stihovi .. ". стиха у одломку " .. podaci.odlomak)
+    print("Нема " .. podaci.stihovi .. ". стиха у одломку " .. podaci.odlomak)
     
     local broj_stihova = 0
     for _, lin in ipairs(linije) do
@@ -761,7 +761,7 @@ end
       end
     end
 
-    print("📘 Одломак " .. podaci.odlomak .. " има " .. broj_sa_imenicom(broj_stihova, "стих", "стиха", "стихова") .. ".")
+    print("Одломак " .. podaci.odlomak .. " има " .. broj_sa_imenicom(broj_stihova, "стих", "стиха", "стихова") .. ".")
   end
 else
   print("\n------- [" .. podaci.odlomak .. "] ---")
@@ -774,7 +774,7 @@ end
 end
   else
 
-  print("🚧 Није пронађен одломак: " .. podaci.odlomak)
+  print("Није пронађен одломак: " .. podaci.odlomak)
   local knjiga = podaci.odlomak:match("^(.-)%d+$")
   if knjiga then
     local najveca_glava = 0
@@ -788,7 +788,7 @@ end
       end
     end
     if najveca_glava > 0 then
-      print("📘 Књига " .. knjiga .. " има " .. broj_sa_imenicom(najveca_glava, "главу", "главе", "глава") .. ".")
+      print("Књига " .. knjiga .. " има " .. broj_sa_imenicom(najveca_glava, "главу", "главе", "глава") .. ".")
     end
   end
 end
@@ -796,4 +796,4 @@ end
   ::continue::
 end
 
-print("-----------\n☦️ С Богом!")
+print("-----------\nС Богом!")
