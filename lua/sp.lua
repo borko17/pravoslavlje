@@ -434,7 +434,7 @@ local izuzeti_odlomci = {
 if novi_unos:match("^п[,#]") then
     local is_phrase_search = novi_unos:match("^п,#") ~= nil
     local deo = novi_unos:sub(is_phrase_search and 4 or 3)
-    print("🔍 Претрага је у току...")
+    print("Претрага је у току...")
     if not deo or deo:match("^%s*$") then
         print("Унесите бар једну ријеч или фразу за претрагу.")
         goto continue
@@ -650,11 +650,11 @@ if novi_unos:match("^с,") then
 end
 
 -- 23
-  -- 📘 Приказ свих глава у књизи ако унос није конкретан стих
+  -- Приказ свих глава у књизи ако унос није конкретан стих
   
   if not novi_unos:find(",") and not novi_unos:find("%-") and not novi_unos:match("%d$") and #novi_unos > 1 then
     local knjiga = novi_unos
-    print("---------------------------------\n📘 Све главе књиге: " .. knjiga .. "\n---------------------------------")
+    print("---------------------------------\nСве главе књиге: " .. knjiga .. "\n---------------------------------")
     local found = false
     for odlomak, tekst in body:gmatch('"(.-)"%s*:%s*"([^"]-)"') do
       if odlomak:lower():match("^" .. knjiga:lower() .. "%d+$") then
