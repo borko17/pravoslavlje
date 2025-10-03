@@ -759,6 +759,6 @@ end
 end
   end
   ::continue::
-
+end
 
 print("-----------\nС Богом!")
