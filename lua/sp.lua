@@ -42,39 +42,18 @@ local zaokruzena_MB = math.floor(velicina_MB * 10 + 0.5) / 10
 
 print("Преузето " .. zaokruzena_MB .. " MB")
 
--- Провера верзије скрипте и JSON-а
--- Преузми скрипту ради провере нове верзије
-local handle_ver = io.popen('curl -s https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua')
-if not handle_ver then
-  print("Грешка при преузимању скрипте за проверу верзије.")
-  return
-end
-
-local skript_body = handle_ver:read("*a")
-handle_ver:close()
-
-if not skript_body or skript_body == "" then
-  print("Грешка: Празан одговор при преузимању скрипте.")
-  return
-end
-
-local nova_verzija = skript_body:match('skript_verzija%s*=%s*"([^"]+)"')
-local nova_stajenovo = skript_body:match('skript_novo%s*=%s*"([^"]+)"')
-local nova_datum = skript_body:match('skript_datum%s*=%s*"([^"]+)"')
 
 local json_verzija = body:match('"сп"%s*:%s*"(.-)"')
 local json_datum = body:match('"датум"%s*:%s*"(.-)"')
 
-if not nova_verzija or not json_verzija then
-  print("Грешка: Није могуће прочитати верзију из скрипте или JSON-а.")
+if not json_verzija then
+  print("Грешка: Није могуће прочитати верзију из JSON-а.")
   return
 end
 
 -- Твоја локална верзија (постављена ручно)
-local skript_verzija = "1.3.2"
-local skript_novo = "Без иконица."
-local skript_datum = "3.10.2025 8:02"
-local github_link = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
+local skript_verzija = "1.3.3"
+local skript_datum = "3.10.2025 17:44"
 
 local global_read_mode = true
 
@@ -344,22 +323,8 @@ if novi_unos == "v" or novi_unos == "в" then
     print("Вријеме измјене: " .. json_datum)
     print("\n== Скрипта ==")
     print("Верзија скрипте: " .. skript_verzija)
-if nova_verzija then
-  if nova_verzija ~= skript_verzija then
-    print("Скрипта није ажурна.")
-    print("Последња верзија: " .. nova_verzija)
-    print("Шта је ново: " .. nova_stajenovo)
-    print("Вријеме измјене: " .. nova_datum)
-    print("\nПреузми нову верзију са:")
-    print(github_link)
-  else
-    print("✔ Скрипта је ажурна.")
-    print("Вријеме измјене: " .. nova_datum)
-  end
-else
-  print("Није могуће одредити последњу верзију скрипте са GitHub-а.")
-end
-  print("\n== lua ==")
+    print("Вријеме измјене: " .. skript_datum)
+    print("\n== lua ==")
     print("Тренутно користите lua верзију:\n" .. _VERSION .."\n\nСкрипта је тестирана на:\nLuaj-jse 3.0.1\nYantra CLI Launcher Pro")
     goto continue
 end
