@@ -214,17 +214,7 @@ else
   return rezultat
 end
 
--- 14
-local function prosiri_opseg(deo)
-    local rezultat = {}
 
-    -- користимо постојећу функцију да извучемо "књигу"
-    local knjiga = izvuci_pocetak_knjige(deo)
-    local ostatak = deo:sub(#knjiga + 1)
-
-    local prva_glava, poslednja_glava = ostatak:match("^(%d+)%-(%d+)$")
-    if knjiga ~= "" and prva_glava and poslednja_glava then
-        for i = tonumber(prva_glava), tonumber(poslednja_glava) do
             table.insert(rezultat, knjiga .. i)
         end
         return rezultat
@@ -248,21 +238,7 @@ local function izdvoji_stihove(stihovi_str)
   
   for deo in stihovi_str:gmatch("[^,]+") do
     -- Proveri da li je deo u formatu "15+"
-    local plus_oznaka = deo:match("^(%d+)%+$")
-    if plus_oznaka then
-      do_kraja = tonumber(plus_oznaka)
-    else
-      -- Procesuiraj standardne opsege (4, 15-22, itd.)
-      local od, do_ = deo:match("^(%d+)%-(%d+)$")
-      if od and do_ then
-        for i = tonumber(od), tonumber(do_) do
-          stihovi[i] = true
-        end
-      else
-        local n = tonumber(deo)
-        if n then
-          stihovi[n] = true
-        end
+    
       end
     end
   end
