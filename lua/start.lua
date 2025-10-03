@@ -1,9 +1,4 @@
--- run.lua
--- Preuzima i pokreće start.lua iz GitHub repozitorijuma
-
 local url = "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/lua/sp.lua"
-
-print("Преузимам скрипту...")
 
 local handle = io.popen("curl -s -L " .. url)
 if not handle then
@@ -15,7 +10,7 @@ local kod = handle:read("*a")
 handle:close()
 
 if not kod or kod == "" then
-  print("Скрипта није преузета.")
+  print("Провјерите интернет конекцију.")
   return
 end
 
@@ -25,5 +20,4 @@ if not fn then
   return
 end
 
-print("Покретање скрипте...")
 fn()
