@@ -4,7 +4,6 @@ print("Преузимање Светог Писма...")
 
 local handle = io.popen(
   'curl -s -D - https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/sveto_pismo.json')
-
 if not handle then
   print("Грешка: Није могуће покренути 'curl'.")
   return
@@ -12,7 +11,6 @@ end
 
 local response = handle:read("*a")
 handle:close()
-
 if not response or response == "" then
   print("Грешка: Није могуће преузети Свето Писмо. Провјерите интернет конекцију.")
   return
@@ -28,40 +26,31 @@ local header, body = response:match("(.-\r?\n\r?\n)(.*)")
 if not body then
   header, body = response:match("(.-\n\n)(.*)")
 end
-
 if not body or body == "" then
   print("Грешка: Преузет садржај је празан или неисправан.")
   return
 end
 
-
 local velicina_bajtova = #body
--- Децимална величина (MB, 1 MB = 1 000 000)
 local velicina_MB = velicina_bajtova / 1000000
 local zaokruzena_MB = math.floor(velicina_MB * 10 + 0.5) / 10
-
 print("Преузето " .. zaokruzena_MB .. " MB")
-
 
 local json_verzija = body:match('"сп"%s*:%s*"(.-)"')
 local json_datum = body:match('"датум"%s*:%s*"(.-)"')
-
 if not json_verzija then
   print("Грешка: Није могуће прочитати верзију из JSON-а.")
   return
 end
 
--- Твоја локална верзија (постављена ручно)
-local skript_verzija = "1.3.3"
-local skript_datum = "3.10.2025 17:44"
+local skript_verzija = "1.3.4"
+local skript_datum = "4.10.2025 15:45"
 
-local global_read_mode = true
-
+local global_read_mode = false
 local function procisti_za_citanje(tekst)
   local cist = {}
   for lin in (tekst .. "\n"):gmatch("([^\r\n]*)\r?\n") do
     local bez = lin:gsub("%b[]", "")
-      -- уклони звездицу
       bez = bez:gsub("%*", "")
       bez = bez:gsub("%•", "")
       bez = bez:gsub("%†", "")
@@ -70,19 +59,20 @@ local function procisti_za_citanje(tekst)
   return table.concat(cist, "\n")
 end
 
-
-
--- 02
-
 local function latinica_u_cirilicu(s)
-  -- Ako je unos tačno "plj" ili počinje sa "plj" i posle sledi broj, ne menjaj "lj" u "љ"
   if not (s == "plj" or s:match("^plj%d") or s == "poslj" or s:match("^poslj%d") or s == "s,plj" or s:match("^s,plj%d") or s == "s,poslj" or s:match("^s,poslj%d")) then
   s = s:gsub("lj", "љ")
 end
   s = s:gsub("nj", "њ")
   s = s:gsub("dž", "џ")
   local mapa = {
-["č"]="ч", ["ć"]="ћ", ["š"]="ш", ["ž"]="ж", ["đ"]="ђ", ["a"]="а", ["b"]="б", ["v"]="в", ["g"]="г", ["d"]="д", ["e"]="е", ["z"]="з", ["i"]="и", ["j"]="ј", ["k"]="к", ["l"]="л", ["m"]="м", ["n"]="н", ["o"]="о", ["p"]="п", ["r"]="р", ["s"]="с", ["t"]="т", ["u"]="у", ["f"]="ф", ["h"]="х", ["c"]="ц",
+  ["č"]="ч", ["ć"]="ћ", ["š"]="ш", ["ž"]="ж", 
+  ["đ"]="ђ", ["a"]="а", ["b"]="б", ["v"]="в", 
+  ["g"]="г", ["d"]="д", ["e"]="е", ["z"]="з", 
+  ["i"]="и", ["j"]="ј", ["k"]="к", ["l"]="л", 
+  ["m"]="м", ["n"]="н", ["o"]="о", ["p"]="п", 
+  ["r"]="р", ["s"]="с", ["t"]="т", ["u"]="у", 
+  ["f"]="ф", ["h"]="х", ["c"]="ц",
   }
   return s:lower():gsub("[%z\1-\127\194-\244][\128-\191]*", function(c)
     if c:match("%d") then return c end
@@ -90,7 +80,6 @@ end
   end)
 end
 
--- 03
 local function uredi_tekst_u_zagradama(sadrzaj)
   if sadrzaj:match("^%d+$") then
     return "[" .. sadrzaj .. "]"
@@ -99,26 +88,18 @@ local function uredi_tekst_u_zagradama(sadrzaj)
   end
 end
 
--- 04
-local alias_map = {
-  ["мтзач1"] = "мт1,1-17",
-  ["нед3"] = "__ispisi_poruku"
-}
-
--- 05
 local knjige_sa_jednom_glavom = {
-  ["авд"] = true, ["послј"] = true, ["флм"] = true,
-  ["2јн"] = true, ["3јн"] = true, ["јуд"] = true
+  ["авд"] = true, ["послј"] = true, 
+  ["флм"] = true, ["2јн"] = true, 
+  ["3јн"] = true, ["јуд"] = true
 }
 
--- 06
 local function safe_insert(t, val)
   local tip = type(val)
   if tip ~= "string" and tip ~= "number" and tip ~= "table" then return end
   table.insert(t, val)
 end
 
--- 07
 local function utf8_char_at(s, i)
   local c = s:byte(i)
   if not c then return nil end
@@ -129,17 +110,14 @@ local function utf8_char_at(s, i)
   else return nil end
 end
 
--- 08
 local function je_cifra(karakter)
   return karakter:match("%d") ~= nil
 end
 
--- 09
 local function je_slovo(karakter)
   return karakter:match("[%aА-Яа-яЈјЉЊЋЏ]") ~= nil
 end
 
--- 10
 local function broj_sa_imenicom(broj, jednina, dvojina, mnozina)
   local mod10 = broj % 10
   local mod100 = broj % 100
@@ -153,14 +131,12 @@ local function broj_sa_imenicom(broj, jednina, dvojina, mnozina)
   end
 end
 
--- 11
 local function random_element(tbl)
   local keys = {}
   for k in pairs(tbl) do table.insert(keys, k) end
   return keys[math.random(#keys)]
 end
 
--- 12
 local function izvuci_pocetak_knjige(deo)
   local i, len, rezultat = 1, #deo, ""
   while i <= len do
@@ -181,15 +157,12 @@ local function izvuci_pocetak_knjige(deo)
   return rezultat
 end
 
--- 13
 local function prosiri_alias(ulaz)
   local rezultat, poslednja_knjiga = {}, nil
   for deo in ulaz:gmatch("[^;%s]+") do
     local pocetak_knjige = izvuci_pocetak_knjige(deo)
     local ostatak = deo:sub(#pocetak_knjige + 1)
     local knjiga = latinica_u_cirilicu(pocetak_knjige)
-
-    -- Ако је књига са једном главом
     if knjige_sa_jednom_glavom[knjiga] then
   if ostatak == "" then
     table.insert(rezultat, knjiga .. "1")
@@ -214,14 +187,10 @@ else
   return rezultat
 end
 
--- 14
 local function prosiri_opseg(deo)
     local rezultat = {}
-
-    -- користимо постојећу функцију да извучемо "књигу"
     local knjiga = izvuci_pocetak_knjige(deo)
     local ostatak = deo:sub(#knjiga + 1)
-
     local prva_glava, poslednja_glava = ostatak:match("^(%d+)%-(%d+)$")
     if knjiga ~= "" and prva_glava and poslednja_glava then
         for i = tonumber(prva_glava), tonumber(poslednja_glava) do
@@ -229,7 +198,6 @@ local function prosiri_opseg(deo)
         end
         return rezultat
     end
-
     local od, do_ = deo:match("^(%d+)%-(%d+)$")
     if od and do_ then
         for i = tonumber(od), tonumber(do_) do
@@ -241,18 +209,14 @@ local function prosiri_opseg(deo)
     return rezultat
 end
 
--- 15
 local function izdvoji_stihove(stihovi_str)
   local stihovi = {}
   local do_kraja = nil
-  
   for deo in stihovi_str:gmatch("[^,]+") do
-    -- Proveri da li je deo u formatu "15+"
     local plus_oznaka = deo:match("^(%d+)%+$")
     if plus_oznaka then
       do_kraja = tonumber(plus_oznaka)
     else
-      -- Procesuiraj standardne opsege (4, 15-22, itd.)
       local od, do_ = deo:match("^(%d+)%-(%d+)$")
       if od and do_ then
         for i = tonumber(od), tonumber(do_) do
@@ -266,28 +230,26 @@ local function izdvoji_stihove(stihovi_str)
       end
     end
   end
-  
   return {
     stihovi = stihovi,
     do_kraja = do_kraja
   }
 end
--- 16
+
 print("\n=== СВЕТО ПИСМО ===")
 print("Унеси скраћеницу из Светог Писма.")
 print("Унеси 'с' за садржај или 'п' за помоћ.")
 print("Притисни Ентер за излаз")
 print("(Скрипта подржава и уносе на латиници)")
 
--- 17
+---------------------------------
+
 while true do
   io.write("> ")
   local unos = input()
-
   if not unos or unos == "" then break end
   print("\n---------------------------------\nунос: " .. unos .. "\n---------------------------------")
 
--- 18
 local novi_unos
 if unos:lower():match("^п,") or unos:lower():match("^p,") then
   novi_unos = latinica_u_cirilicu(unos)
@@ -295,7 +257,6 @@ else
   local delovi = {}
   for deo in unos:gmatch("[^;%s]+") do
     deo = deo:gsub("^[()•†*§%.,!\"'%-\\%[%]]+", ""):gsub("[()•†*§%.,!\"'%-\\%[%]]+$", "")
-    -- First expand any ranges in the part
     local prosireni = prosiri_opseg(deo)
     for _, p in ipairs(prosireni) do
       table.insert(delovi, p)
@@ -305,18 +266,16 @@ else
   novi_unos = latinica_u_cirilicu(ociscen_unos)
 end
 
--- Кomande za globalni režim čitanja
 if novi_unos == "чит" then
   global_read_mode = true
   print("Укључен је режим читања.")
   goto continue
-elseif novi_unos == "пов" then
+elseif novi_unos == "реф" then
   global_read_mode = false
-  print("Укључене су повезнице.")
+  print("Укључене су референце.")
   goto continue
 end
 
--- tekst
 if novi_unos == "v" or novi_unos == "в" then
     print("\n== Свето Писмо ==")
     print("Верзија Светог Писма: " .. json_verzija)
@@ -329,22 +288,17 @@ if novi_unos == "v" or novi_unos == "в" then
     goto continue
 end
 
-
--- 19
--- Насумичан стих:
 if novi_unos == "n" or novi_unos == "н" then
   local odlomci = {}
   for odlomak, tekst in body:gmatch('"(.-)"%s*:%s*"([^"]-)"') do
-    if tekst:match("\n%d+%.") then -- само ако има бројеве стихова
+    if tekst:match("\n%d+%.") then
       table.insert(odlomci, {odlomak=odlomak, tekst=tekst})
     end
   end
-  
   if #odlomci == 0 then
     print("Није пронађен ниједан валидан одломак.")
     goto continue
   end
-  
   local nasumicni = odlomci[math.random(#odlomci)]
   local linije = {}
   for lin in nasumicni.tekst:gmatch("[^\r\n]+") do
@@ -352,30 +306,25 @@ if novi_unos == "n" or novi_unos == "н" then
       table.insert(linije, lin)
     end
   end
-
   if #linije == 0 then
     print("Одломак нема стихове.")
     goto continue
   end
-
-  -- Насумичан почетни индекс тако да има места за 3 узастопна стиха
   local max_start = math.max(1, #linije - 2)
   local start_index = math.random(max_start)
-
   print("---------------------------------\nИз које књиге су ови стихови?\n---------------------------------")
   for i = start_index, math.min(start_index + 2, #linije) do
     local stih = linije[i]
     print(stih:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
   end
   print("---------------------------------\nЗа одговор стисни Ентер.")
-local unos = input()
-if unos == "" then
+  local unos = input()
+  if unos == "" then
   print("\nОдговор: [" .. nasumicni.odlomak .. "]")
   local sve_linije = {}
   for lin in nasumicni.tekst:gmatch("[^\r\n]+") do
     table.insert(sve_linije, lin)
   end
-  -- uzimamo drugu liniju (naslov knjige)
   local druga_linija = sve_linije[2]
   if druga_linija then
     print(druga_linija:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
@@ -388,12 +337,9 @@ end
   goto continue
 end
 
-
--- Претрага више речи или фразе
--- Dodaj listu odlomaka koje želimo izuzeti iz pretrage
 local izuzeti_odlomci = {
-    ["с"] = true,  -- изузимам садржај
-    ["п"] = true   -- изузимам помоћ
+    ["с"] = true,
+    ["п"] = true
 }
 
 if novi_unos:match("^п[,#]") then
@@ -404,21 +350,15 @@ if novi_unos:match("^п[,#]") then
         print("Унесите бар једну ријеч или фразу за претрагу.")
         goto continue
     end
-
     local rezultati = {}
     local ukupan_broj = 0
-
-    -- Logika za pretragu
     local search_terms = {}
-    
     if is_phrase_search then
-        -- Za frazno pretraživanje, uzimamo celu frazu nakon p,# i uklanjamo # ako postoji na početku
         local fraza = latinica_u_cirilicu(deo):lower():gsub("^%s*#", ""):gsub("^%s*(.-)%s*$", "%1")
         if fraza ~= "" then
             table.insert(search_terms, fraza)
         end
     else
-        -- Za normalno pretraživanje, delimo po zarezima
         for rec in deo:gmatch("([^,]+)") do
             local cir_rec = latinica_u_cirilicu(rec):lower():gsub("^%s*(.-)%s*$", "%1")
             if cir_rec ~= "" then 
@@ -426,10 +366,6 @@ if novi_unos:match("^п[,#]") then
             end
         end
     end
-
-    -- Остатак кода остаје исти...
-    -- [исти код као претходно]
-
     if #search_terms == 0 then
         print("Нисте унели ниједну важећу ријеч или фразу.")
         goto continue
@@ -439,8 +375,6 @@ if novi_unos:match("^п[,#]") then
         if not izuzeti_odlomci[odlomak] then
             local current_verse = nil
             local verse_content = {}
-            
-            -- Функција за проверу стиха
             local function check_verse()
                 if current_verse and #verse_content > 0 then
                     local full_verse = table.concat(verse_content, " ")
@@ -448,12 +382,10 @@ if novi_unos:match("^п[,#]") then
                     local sve_prisutne = true
                     
                     if is_phrase_search then
-                        -- Za frazno pretraživanje, tražimo tačno podudaranje
                         if not verse_clean:find(search_terms[1], 1, true) then
                             sve_prisutne = false
                         end
                     else
-                        -- Normalno pretraživanje - sve reči moraju biti prisutne
                         for _, trazena in ipairs(search_terms) do
                             if not verse_clean:find(trazena, 1, true) then
                                 sve_prisutne = false
@@ -474,22 +406,17 @@ if novi_unos:match("^п[,#]") then
             end
 
             for lin in tekst:gmatch("[^\r\n]+") do
-                -- Провера да ли ред почиње бројем
                 local broj = lin:match("^(%d+)")
                 if broj then
-                    -- Провери претходни стих пре него што почнеш нови
                     check_verse()
-                    -- Започни нови стих
                     current_verse = broj
                     verse_content = {lin}
                 else
-                    -- Додај ред текућем стиху
                     if current_verse then
                         table.insert(verse_content, lin)
                     end
                 end
             end
-            -- Провери последњи стих
             check_verse()
         end
     end
@@ -506,7 +433,7 @@ if novi_unos:match("^п[,#]") then
         else
             print("---------------------------------\nПронађено укупно " .. broj_sa_imenicom(ukupan_broj, "стих", "стиха", "стихова") .. " где се налазе ријечи: '" .. table.concat(search_terms, "', '") .. "'\n---------------------------------")
         end
-        os.execute("sleep 2") -- za Linux/macOS
+        os.execute("sleep 2")
         for _, r in ipairs(rezultati) do
     if global_read_mode then
         print("[" .. r.odlomak .. "," .. r.broj_stiha .. "] " .. procisti_za_citanje(r.tekst))
@@ -514,14 +441,9 @@ if novi_unos:match("^п[,#]") then
         print("[" .. r.odlomak .. "," .. r.broj_stiha .. "] " .. r.tekst:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
     end
 end
-
     end
-
     goto continue
 end
-
--- 21
-  -- Специјални случај: ако је 'с' или 'п', прикажи директно садржај из JSON-а
 
 local specijalni_tekst = body:match('"' .. novi_unos .. '"%s*:%s*"([^"]-)"')
 if specijalni_tekst then
@@ -534,19 +456,6 @@ end
   goto continue
 end
 
-  if alias_map[novi_unos] then
-    novi_unos = alias_map[novi_unos]
-  end
-
--- 04a
-if novi_unos == "__ispisi_poruku" then
-  print("нед3 - [рим5,1-10; мт6,20-33]")
-  goto continue
-end
-
-
--- 22
--- Специјални случај: ако је 'с,', приказати садржај
 local function fix_utf8(s)
     return s:gsub("￑", "р")
 end
@@ -610,13 +519,9 @@ if novi_unos:match("^с,") then
       print("Није пронађен садржај за књигу: " .. knjiga)
     end
   end
-
   goto continue
 end
 
--- 23
-  -- Приказ свих глава у књизи ако унос није конкретан стих
-  
   if not novi_unos:find(",") and not novi_unos:find("%-") and not novi_unos:match("%d$") and #novi_unos > 1 then
     local knjiga = novi_unos
     print("---------------------------------\nСве главе књиге: " .. knjiga .. "\n---------------------------------")
@@ -630,7 +535,6 @@ if global_read_mode then
 else
   print(tekst:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
 end
-
         found = true
       end
     end
@@ -640,11 +544,8 @@ end
     goto continue
   end
 
-
--- 24
   local svi_aliasi = prosiri_alias(novi_unos)
   local svi_odlomci = {}
-
   for _, deo in ipairs(svi_aliasi) do
     local knj, stihovi_str = deo:match("^(.-),(.+)$")
     if knj then
@@ -672,7 +573,6 @@ end
 local ciljani = izdvoji_stihove(podaci.stihovi)
 local izabrano = {}
 
--- Prvo dodaj sve eksplicitno navedene stihove
 local i = 1
 while i <= #linije do
   local broj = tonumber(linije[i]:match("^(%d+)%."))
@@ -689,7 +589,6 @@ while i <= #linije do
   end
 end
 
--- Zatim dodaj sve stihove od "do_kraja" do kraja poglavlja
 if ciljani.do_kraja then
   local pronadjen_pocetak = false
   for _, lin in ipairs(linije) do
@@ -697,7 +596,6 @@ if ciljani.do_kraja then
     if broj then
       if broj >= ciljani.do_kraja then
         pronadjen_pocetak = true
-        -- Proveri da li smo već dodali ovaj stih u prvom delu
         if not ciljani.stihovi[broj] then
           table.insert(izabrano, lin)
         end
@@ -738,7 +636,6 @@ end
 
 end
   else
-
   print("Није пронађен одломак: " .. podaci.odlomak)
   local knjiga = podaci.odlomak:match("^(.-)%d+$")
   if knjiga then
