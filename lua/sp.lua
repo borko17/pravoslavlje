@@ -43,10 +43,10 @@ if not json_verzija then
   return
 end
 
-local skript_verzija = "1.3.5"
-local skript_datum = "5.10.2025 7:20"
+local skript_verzija = "1.3.6"
+local skript_datum = "5.10.2025 7:25"
 
-local global_read_mode = false
+local global_read_mode = true
 local function procisti_za_citanje(tekst)
   local cist = {}
   for lin in (tekst .. "\n"):gmatch("([^\r\n]*)\r?\n") do
