@@ -43,8 +43,8 @@ if not json_verzija then
   return
 end
 
-local skript_verzija = "1.3.6"
-local skript_datum = "5.10.2025 7:25"
+local skript_verzija = "1.3.7"
+local skript_datum = "5.10.2025 7:45"
 
 local global_read_mode = true
 local function procisti_za_citanje(tekst)
@@ -242,11 +242,22 @@ print("Унеси 'с' за садржај или 'п' за помоћ.")
 print("Притисни Ентер за излаз")
 print("(Скрипта подржава и уносе на латиници)")
 
+-- Detekcija okruženja (Luaj-jse vs standardni Lua)
+local function get_input()
+  if _VERSION:match("Luaj%-jse") or package.loaded["luaj"] or os.getenv("LUAJ_JSE") then
+    return input
+  else
+    return io.read
+  end
+end
+
+local read_input = get_input()
+
 ---------------------------------
 
 while true do
   io.write("> ")
-  local unos = input()
+  local unos = read_input()
   if not unos or unos == "" then break end
   print("\n---------------------------------\nунос: " .. unos .. "\n---------------------------------")
 
@@ -318,7 +329,7 @@ if novi_unos == "n" or novi_unos == "н" then
     print(stih:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
   end
   print("---------------------------------\nЗа одговор стисни Ентер.")
-  local unos = input()
+  local unos = read_input()
   if unos == "" then
   print("\nОдговор: [" .. nasumicni.odlomak .. "]")
   local sve_linije = {}
