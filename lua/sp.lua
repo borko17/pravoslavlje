@@ -43,8 +43,8 @@ if not json_verzija then
   return
 end
 
-local skript_verzija = "1.3.4"
-local skript_datum = "4.10.2025 15:45"
+local skript_verzija = "1.3.5"
+local skript_datum = "5.10.2025 7:20"
 
 local global_read_mode = false
 local function procisti_za_citanje(tekst)
@@ -343,112 +343,109 @@ local izuzeti_odlomci = {
 }
 
 if novi_unos:match("^п[,#]") then
-    local is_phrase_search = novi_unos:match("^п,#") ~= nil
-    local deo = novi_unos:sub(is_phrase_search and 4 or 3)
-    print("Претрага је у току...")
-    if not deo or deo:match("^%s*$") then
-        print("Унесите бар једну ријеч или фразу за претрагу.")
-        goto continue
+ local is_phrase_search = novi_unos:match("^п,#") ~= nil
+ local deo = novi_unos:sub(is_phrase_search and 4 or 3)
+ print("Претрага је у току...")
+ if not deo or deo:match("^%s*$") then
+ print("Унесите бар једну ријеч или фразу за претрагу.")
+   goto continue
+ end
+ local rezultati = {}
+ local ukupan_broj = 0
+ local search_terms = {}
+  if is_phrase_search then
+   local fraza = latinica_u_cirilicu(deo):lower():gsub("^%s*#", ""):gsub("^%s*(.-)%s*$", "%1")
+  if fraza ~= "" then
+   table.insert(search_terms, fraza)
+  end
+   else
+  for rec in deo:gmatch("([^,]+)") do
+   local cir_rec = latinica_u_cirilicu(rec):lower():gsub("^%s*(.-)%s*$", "%1")
+  if cir_rec ~= "" then 
+    table.insert(search_terms, cir_rec)
     end
-    local rezultati = {}
-    local ukupan_broj = 0
-    local search_terms = {}
-    if is_phrase_search then
-        local fraza = latinica_u_cirilicu(deo):lower():gsub("^%s*#", ""):gsub("^%s*(.-)%s*$", "%1")
-        if fraza ~= "" then
-            table.insert(search_terms, fraza)
-        end
-    else
-        for rec in deo:gmatch("([^,]+)") do
-            local cir_rec = latinica_u_cirilicu(rec):lower():gsub("^%s*(.-)%s*$", "%1")
-            if cir_rec ~= "" then 
-                table.insert(search_terms, cir_rec)
-            end
-        end
-    end
-    if #search_terms == 0 then
-        print("Нисте унели ниједну важећу ријеч или фразу.")
-        goto continue
-    end
+   end
+  end
+  if #search_terms == 0 then
+   print("Нисте унели ниједну важећу ријеч или фразу.")
+   goto continue
+  end
 
-    for odlomak, tekst in body:gmatch('"(.-)"%s*:%s*"([^"]-)"') do
-        if not izuzeti_odlomci[odlomak] then
-            local current_verse = nil
-            local verse_content = {}
-            local function check_verse()
-                if current_verse and #verse_content > 0 then
-                    local full_verse = table.concat(verse_content, " ")
-                    local verse_clean = latinica_u_cirilicu(full_verse):lower()
-                    local sve_prisutne = true
-                    
-                    if is_phrase_search then
-                        if not verse_clean:find(search_terms[1], 1, true) then
-                            sve_prisutne = false
-                        end
-                    else
-                        for _, trazena in ipairs(search_terms) do
-                            if not verse_clean:find(trazena, 1, true) then
-                                sve_prisutne = false
-                                break
-                            end
-                        end
-                    end
-                    
-                    if sve_prisutne then
-                        ukupan_broj = ukupan_broj + 1
-                        table.insert(rezultati, {
-                            odlomak = odlomak,
-                            broj_stiha = current_verse,
-                            tekst = full_verse
-                        })
-                    end
-                end
-            end
+ for odlomak, tekst in body:gmatch('"(.-)"%s*:%s*"([^"]-)"') do
+  if not izuzeti_odlomci[odlomak] then
+   local current_verse = nil
+   local verse_content = {}
+   local function check_verse()
+  if current_verse and #verse_content > 0 then
+   local full_verse = table.concat(verse_content, " ")
+   local verse_clean = latinica_u_cirilicu(full_verse):lower()
+   local sve_prisutne = true
+  if is_phrase_search then
+   if not verse_clean:find(search_terms[1], 1, true) then
+    sve_prisutne = false
+     end
+ else
+  for _, trazena in ipairs(search_terms) do
+   if not verse_clean:find(trazena, 1, true) then
+    sve_prisutne = false
+     break
+    end
+   end
+  end
+ if sve_prisutne then
+  ukupan_broj = ukupan_broj + 1
+  table.insert(rezultati, {
+  odlomak = odlomak,
+  broj_stiha = current_verse,
+  tekst = full_verse
+  })
+    end
+   end
+  end
+  for lin in tekst:gmatch("[^\r\n]+") do
+   local broj = lin:match("^(%d+)")
+ if broj then
+  check_verse()
+  current_verse = broj
+  verse_content = {lin}
+ else
+  if current_verse then
+  table.insert(verse_content, lin)
+   end
+  end
+ end
+  check_verse()
+  end
+ end
 
-            for lin in tekst:gmatch("[^\r\n]+") do
-                local broj = lin:match("^(%d+)")
-                if broj then
-                    check_verse()
-                    current_verse = broj
-                    verse_content = {lin}
-                else
-                    if current_verse then
-                        table.insert(verse_content, lin)
-                    end
-                end
-            end
-            check_verse()
-        end
-    end
-
-    if ukupan_broj == 0 then
-        if is_phrase_search then
-            print("Није пронађен ниједан стих са фразом: '" .. search_terms[1] .. "'")
-        else
-            print("Није пронађен ниједан стих са ријечима: '" .. table.concat(search_terms, "', '") .. "'")
-        end
-    else
-        if is_phrase_search then
-            print("---------------------------------\nПронађено укупно " .. broj_sa_imenicom(ukupan_broj, "стих", "стиха", "стихова") .. " где се налази фраза: '" .. search_terms[1] .. "'\n---------------------------------")
-        else
-            print("---------------------------------\nПронађено укупно " .. broj_sa_imenicom(ukupan_broj, "стих", "стиха", "стихова") .. " где се налазе ријечи: '" .. table.concat(search_terms, "', '") .. "'\n---------------------------------")
-        end
-        os.execute("sleep 2")
-        for _, r in ipairs(rezultati) do
-    if global_read_mode then
-        print("[" .. r.odlomak .. "," .. r.broj_stiha .. "] " .. procisti_za_citanje(r.tekst))
-    else
-        print("[" .. r.odlomak .. "," .. r.broj_stiha .. "] " .. r.tekst:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
-    end
-end
-    end
-    goto continue
+ if ukupan_broj == 0 then
+  if is_phrase_search then
+   print("Није пронађен ниједан стих са фразом: '" .. search_terms[1] .. "'")
+  else
+   print("Није пронађен ниједан стих са ријечима: '" .. table.concat(search_terms, "', '") .. "'")
+  end
+ else
+  if is_phrase_search then
+   print("---------------------------------\nПронађено укупно " .. broj_sa_imenicom(ukupan_broj, "стих", "стиха", "стихова") .. " где се налази фраза: '" .. search_terms[1] .. "'\n---------------------------------")
+  else
+    print("---------------------------------\nПронађено укупно " .. broj_sa_imenicom(ukupan_broj, "стих", "стиха", "стихова") .. " где се налазе ријечи: '" .. table.concat(search_terms, "', '") .. "'\n---------------------------------")
+   end
+ os.execute("sleep 2")
+ for _, r in ipairs(rezultati) do
+  if global_read_mode then
+   print("[" .. r.odlomak .. "," .. r.broj_stiha .. "] " .. procisti_za_citanje(r.tekst))
+  else
+   print("[" .. r.odlomak .. "," .. r.broj_stiha .. "] " .. r.tekst:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
+   end
+  end
+ end
+ goto continue
 end
 
 local specijalni_tekst = body:match('"' .. novi_unos .. '"%s*:%s*"([^"]-)"')
 if specijalni_tekst then
   print("\n------- [" .. novi_unos .. "] -------")
-  if global_read_mode then
+  if global_read_mode and not (novi_unos == "п") then
   print(procisti_za_citanje(specijalni_tekst))
 else
   print(specijalni_tekst:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
