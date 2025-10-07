@@ -43,8 +43,8 @@ if not json_verzija then
   return
 end
 
-local skript_verzija = "1.3.7"
-local skript_datum = "5.10.2025 7:45"
+local skript_verzija = "1.3.8"
+local skript_datum = "7.10.2025 12:20"
 
 local global_read_mode = true
 local function procisti_za_citanje(tekst)
@@ -571,6 +571,7 @@ end
 
   for _, podaci in ipairs(svi_odlomci) do
   local tekst = body:match('"' .. podaci.odlomak .. '"%s*:%s*"([^"]-)"')
+
   if tekst then
     local linije = {}
     for lin in tekst:gmatch("[^\r\n]+") do
@@ -580,6 +581,20 @@ end
     if podaci.stihovi then
 local ciljani = izdvoji_stihove(podaci.stihovi)
 local izabrano = {}
+
+if podaci.stihovi == "натпис" then
+  local linije = {}
+  for lin in tekst:gmatch("[^\r\n]+") do
+    table.insert(linije, lin)
+  end
+  local treca_linija = linije[4]
+  if treca_linija then
+    print(treca_linija:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
+  else
+    print("Није пронађен натпис у " .. podaci.odlomak)
+  end
+  goto continue
+end
 
 local i = 1
 while i <= #linije do
