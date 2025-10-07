@@ -43,8 +43,8 @@ if not json_verzija then
   return
 end
 
-local skript_verzija = "1.3.8"
-local skript_datum = "7.10.2025 12:20"
+local skript_verzija = "1.3.9"
+local skript_datum = "7.10.2025 15:20"
 
 local global_read_mode = true
 local function procisti_za_citanje(tekst)
@@ -579,85 +579,91 @@ end
     end
 
     if podaci.stihovi then
-local ciljani = izdvoji_stihove(podaci.stihovi)
-local izabrano = {}
+    local ciljani = izdvoji_stihove(podaci.stihovi)
+    local izabrano = {}
 
-if podaci.stihovi == "натпис" then
-  local linije = {}
-  for lin in tekst:gmatch("[^\r\n]+") do
-    table.insert(linije, lin)
-  end
-  local treca_linija = linije[4]
-  if treca_linija then
-    print(treca_linija:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
-  else
-    print("Није пронађен натпис у " .. podaci.odlomak)
-  end
-  goto continue
-end
-
-local i = 1
-while i <= #linije do
-  local broj = tonumber(linije[i]:match("^(%d+)%."))
-  if broj and ciljani.stihovi[broj] then
-    local blok = { linije[i] }
-    i = i + 1
-    while i <= #linije and not linije[i]:match("^%d+%.") do
-      table.insert(blok, linije[i])
-      i = i + 1
-    end
-    table.insert(izabrano, table.concat(blok, "\n"))
-  else
-    i = i + 1
-  end
-end
-
-if ciljani.do_kraja then
-  local pronadjen_pocetak = false
-  for _, lin in ipairs(linije) do
-    local broj = tonumber(lin:match("^(%d+)%."))
-    if broj then
-      if broj >= ciljani.do_kraja then
-        pronadjen_pocetak = true
-        if not ciljani.stihovi[broj] then
-          table.insert(izabrano, lin)
+    -- Посебан третман за натпис
+    if podaci.stihovi == "натпис" then
+        local linije = {}
+        for lin in tekst:gmatch("[^\r\n]+") do
+            table.insert(linije, lin)
         end
-      end
-    elseif pronadjen_pocetak then
-      table.insert(izabrano, lin)
-    end
-  end
-end
+        local treca_linija = linije[4]  -- Натпис је обично на 4. линији
+        if treca_linija then
+            print("\n------- [" .. podaci.odlomak .. "," .. podaci.stihovi .. "] ---")
+            if global_read_mode then
+                print(procisti_za_citanje(treca_linija))
+            else
+                print(treca_linija:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
+            end
+        else
+            print("Није пронађен натпис у " .. podaci.odlomak)
+        end
+        -- Не правимо goto continue, настављамо са следећим делом уноса
+    else
+        -- Нормална обрада стихова
+        local i = 1
+        while i <= #linije do
+            local broj = tonumber(linije[i]:match("^(%d+)%."))
+            if broj and ciljani.stihovi[broj] then
+                local blok = { linije[i] }
+                i = i + 1
+                while i <= #linije and not linije[i]:match("^%d+%.") do
+                    table.insert(blok, linije[i])
+                    i = i + 1
+                end
+                table.insert(izabrano, table.concat(blok, "\n"))
+            else
+                i = i + 1
+            end
+        end
 
-  if #izabrano > 0 then
-    print("\n------- [" .. podaci.odlomak .. "," .. podaci.stihovi .. "] ---")
+        if ciljani.do_kraja then
+            local pronadjen_pocetak = false
+            for _, lin in ipairs(linije) do
+                local broj = tonumber(lin:match("^(%d+)%."))
+                if broj then
+                    if broj >= ciljani.do_kraja then
+                        pronadjen_pocetak = true
+                        if not ciljani.stihovi[broj] then
+                            table.insert(izabrano, lin)
+                        end
+                    end
+                elseif pronadjen_pocetak then
+                    table.insert(izabrano, lin)
+                end
+            end
+        end
+
+        if #izabrano > 0 then
+            print("\n------- [" .. podaci.odlomak .. "," .. podaci.stihovi .. "] ---")
+            if global_read_mode then
+                print(procisti_za_citanje(table.concat(izabrano, "\n")))
+            else
+                print((table.concat(izabrano, "\n")):gsub("%[(.-)%]", uredi_tekst_u_zagradama))
+            end
+        else
+            print("Нема " .. podaci.stihovi .. ". стиха у одломку " .. podaci.odlomak)
+            
+            local broj_stihova = 0
+            for _, lin in ipairs(linije) do
+                if lin:match("^%d+%.") then
+                    broj_stihova = broj_stihova + 1
+                end
+            end
+            print("Одломак " .. podaci.odlomak .. " има " .. broj_sa_imenicom(broj_stihova, "стих", "стиха", "стихова") .. ".")
+        end
+    end
+else
+    -- Код за приказ читавог одломка без специфичних стихова
+    print("\n------- [" .. podaci.odlomak .. "] ---")
     if global_read_mode then
-  print(procisti_za_citanje(table.concat(izabrano, "\n")))
-else
-  print((table.concat(izabrano, "\n")):gsub("%[(.-)%]", uredi_tekst_u_zagradama))
-end
-
-  else
-    print("Нема " .. podaci.stihovi .. ". стиха у одломку " .. podaci.odlomak)
-    
-    local broj_stihova = 0
-    for _, lin in ipairs(linije) do
-      if lin:match("^%d+%.") then
-        broj_stihova = broj_stihova + 1
-      end
+        print(procisti_za_citanje(tekst))
+    else
+        print(tekst:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
     end
-
-    print("Одломак " .. podaci.odlomak .. " има " .. broj_sa_imenicom(broj_stihova, "стих", "стиха", "стихова") .. ".")
-  end
-else
-  print("\n------- [" .. podaci.odlomak .. "] ---")
- if global_read_mode then
-  print(procisti_za_citanje(tekst))
-else
-  print(tekst:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
 end
 
-end
   else
   print("Није пронађен одломак: " .. podaci.odlomak)
   local knjiga = podaci.odlomak:match("^(.-)%d+$")
