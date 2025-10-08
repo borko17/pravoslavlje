@@ -1,5 +1,5 @@
 
--- 01
+-- Слава Богу
 print("Преузимање Светог Писма...")
 
 local handle = io.popen(
@@ -43,8 +43,8 @@ if not json_verzija then
   return
 end
 
-local skript_verzija = "1.4.0"
-local skript_datum = "7.10.2025 17:00"
+local skript_verzija = "1.4.1"
+local skript_datum = "8.10.2025 16:10"
 
 local global_read_mode = true
 local function procisti_za_citanje(tekst)
@@ -277,11 +277,11 @@ else
   novi_unos = latinica_u_cirilicu(ociscen_unos)
 end
 
-if novi_unos == "чит" then
+if novi_unos == "ч" then
   global_read_mode = true
   print("Укључен је режим читања.")
   goto continue
-elseif novi_unos == "реф" then
+elseif novi_unos == "р" then
   global_read_mode = false
   print("Укључене су референце.")
   goto continue
@@ -327,9 +327,9 @@ if novi_unos == "n" or novi_unos == "н" then
   for i = start_index, math.min(start_index + 2, #linije) do
     local stih = linije[i]
     if global_read_mode then
-      print(procisti_za_citanje(stih))  -- РЕЖИМ ЧИТАЊА
+      print(procisti_za_citanje(stih))
     else
-      print(stih:gsub("%[(.-)%]", uredi_tekst_u_zagradama))  -- РЕЖИМ СА РЕФЕРЕНЦАМА
+      print(stih:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
     end
   end
   print("---------------------------------\nЗа одговор стисни Ентер.")
@@ -343,17 +343,17 @@ if novi_unos == "n" or novi_unos == "н" then
   local druga_linija = sve_linije[2]
   if druga_linija then
     if global_read_mode then
-      print(procisti_za_citanje(druga_linija))  -- РЕЖИМ ЧИТАЊА
+      print(procisti_za_citanje(druga_linija))
     else
-      print(druga_linija:gsub("%[(.-)%]", uredi_tekst_u_zagradama))  -- РЕЖИМ СА РЕФЕРЕНЦАМА
+      print(druga_linija:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
     end
   end
   local treca_linija = sve_linije[3]
   if treca_linija then
     if global_read_mode then
-      print(procisti_za_citanje(treca_linija))  -- РЕЖИМ ЧИТАЊА
+      print(procisti_za_citanje(treca_linija))
     else
-      print(treca_linija:gsub("%[(.-)%]", uredi_tekst_u_zagradama))  -- РЕЖИМ СА РЕФЕРЕНЦАМА
+      print(treca_linija:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
     end
   end
 end
@@ -594,37 +594,31 @@ end
     local ciljani = izdvoji_stihove(podaci.stihovi)
     local izabrano = {}
 
--- Посебан третман за натпис
-if podaci.stihovi == "натпис" then
+if podaci.stihovi == "н" then
     local linije = {}
     for lin in tekst:gmatch("[^\r\n]+") do
         table.insert(linije, lin)
     end
-    local treca_linija = linije[4]  -- Натпис је обично на 4. линији
-    local cetvrta_linija = linije[5]  -- 5. линија (ако постоји)
+    local treca_linija = linije[4]
+    local cetvrta_linija = linije[5]
     
     if treca_linija then
         print("\n------- [" .. podaci.odlomak .. "," .. podaci.stihovi .. "] ---")
         if global_read_mode then
             print(procisti_za_citanje(treca_linija))
-            -- Додај 5. линију само ако постоји и не почиње са ---
             if cetvrta_linija and not cetvrta_linija:match("^%-%-%-") then
                 print(procisti_za_citanje(cetvrta_linija))
             end
         else
             print(treca_linija:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
-            -- Додај 5. линију само ако постоји и не почиње са ---
-            if cetvrta_linija and not cetvrta_linija:match("^%-") then
+            if cetvrta_linija and not cetvrta_linija:match("^%-%-%-") then
                 print(cetvrta_linija:gsub("%[(.-)%]", uredi_tekst_u_zagradama))
             end
         end
     else
         print("Није пронађен натпис у " .. podaci.odlomak)
     end
-    -- Не правимо goto continue, настављамо са следећим делом уноса
-
     else
-        -- Нормална обрада стихова
         local i = 1
         while i <= #linije do
             local broj = tonumber(linije[i]:match("^(%d+)%."))
@@ -678,7 +672,6 @@ if podaci.stihovi == "натпис" then
         end
     end
 else
-    -- Код за приказ читавог одломка без специфичних стихова
     print("\n------- [" .. podaci.odlomak .. "] ---")
     if global_read_mode then
         print(procisti_za_citanje(tekst))
