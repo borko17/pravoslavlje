@@ -1,33 +1,33 @@
 -- Слава Богу
 print("Преузимање Светог Писма...")
 
-local handle =
- io.popen("curl -s -D - https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/sveto_pismo.json")
-if not handle then
- print("Грешка: Није могуће покренути 'curl'.")
- return
+-- Umjesto io.popen("curl ..."):
+local function fetchUrl(url)
+    local URL = luajava.bindClass("java.net.URL")
+    local BufferedReader = luajava.bindClass("java.io.BufferedReader")
+    local InputStreamReader = luajava.bindClass("java.io.InputStreamReader")
+
+    local urlObj = luajava.new(URL, url)
+    local conn = urlObj:openConnection()
+    conn:setRequestMethod("GET")
+    conn:setConnectTimeout(15000)
+    conn:setReadTimeout(15000)
+
+    local reader = luajava.new(BufferedReader, luajava.new(InputStreamReader, conn:getInputStream(), "UTF-8"))
+    local content = {}
+    local line = reader:readLine()
+    while line ~= nil do
+        table.insert(content, line)
+        line = reader:readLine()
+    end
+    reader:close()
+    return table.concat(content, "\n")
 end
 
-local response = handle:read("*a")
-handle:close()
-if not response or response == "" then
- print("Грешка: Није могуће преузети Свето Писмо. Провјерите интернет конекцију.")
- return
-end
-
-local status_line = response:match("^(HTTP/%d%.%d %d+ .-)\r?\n")
-if status_line and not status_line:find("200 OK") then
- print("Грешка: није пронађен тражени фајл на серверу → " .. status_line)
- return
-end
-
-local header, body = response:match("(.-\r?\n\r?\n)(.*)")
-if not body then
- header, body = response:match("(.-\n\n)(.*)")
-end
-if not body or body == "" then
- print("Грешка: Преузет садржај је празан или неисправан.")
- return
+local ok, body = pcall(fetchUrl, "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/sveto_pismo.json")
+if not ok or not body or body == "" then
+    print("Грешка: Није могуће преузети Свето Писмо.")
+    return
 end
 
 local velicina_bajtova = #body
