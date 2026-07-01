@@ -24,7 +24,7 @@ local function fetchUrl(url)
     return table.concat(content, "\n")
 end
 
-local ok, body = pcall(fetchUrl, "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/sveto_pismo.json")
+local ok, body = pcall(fetchUrl, "https://raw.githubusercontent.com/borko17/pravoslavlje/refs/heads/main/molitvenik.json")
 if not ok or not body or body == "" then
     print("Грешка: Није могуће преузети Свето Писмо.")
     return
